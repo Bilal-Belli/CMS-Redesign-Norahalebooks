@@ -1,0 +1,55 @@
+<%- include('partials/header') %>
+<%- include('partials/sidebar') %>
+
+<main class="flex-1 overflow-y-auto p-4 md:p-8 ">
+
+    <div class="mb-6 md:mb-8">
+        <h1 class="text-2xl md:text-3xl font-bold text-gray-900 flex items-center gap-3">
+            <i data-lucide="users" class="w-7 h-7 text-gray-700 md:w-8 md:h-8"></i>
+            Newsletter Subscribers
+        </h1>
+        <p class="text-sm text-gray-500 mt-1">Subscriber management has moved to Kit.</p>
+    </div>
+
+    <div class="bg-white border border-gray-200 rounded-xl p-6 md:p-8 max-w-2xl">
+        <p class="text-sm md:text-base text-gray-600 leading-relaxed mb-6">
+            All newsletter, contact, and bonus-recipe signups are now collected and managed in your Kit account. Use the
+            Kit dashboard to view subscribers, segment by form, set up automations, and send broadcasts.
+        </p>
+
+        <div>
+            <a href="https://app.kit.com/subscribers" target="_blank" rel="noopener noreferrer"
+                class="inline-flex items-center gap-2 bg-[#335F55] hover:bg-[#284B43] text-white px-5 py-2.5 rounded-lg text-sm font-medium tracking-wide shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-[#335F55]/30">
+                Open Kit dashboard
+                <i data-lucide="external-link" class="w-4 h-4"></i>
+            </a>
+        </div>
+    </div>
+
+</main>
+
+</div>
+<script>
+    lucide.createIcons();
+
+    const menuToggle = document.getElementById('menu-toggle');
+    const menuClose = document.getElementById('menu-close');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
+
+    function openMenu() { sidebar.classList.remove('hidden'); sidebar.classList.add('flex'); overlay.classList.remove('hidden'); }
+    function closeMenu() { sidebar.classList.add('hidden'); sidebar.classList.remove('flex'); overlay.classList.add('hidden'); }
+
+    menuToggle.addEventListener('click', openMenu);
+    menuClose.addEventListener('click', closeMenu);
+    overlay.addEventListener('click', closeMenu);
+
+    window.addEventListener('resize', () => {
+        if (window.innerWidth >= 768) {
+            sidebar.classList.remove('hidden'); sidebar.classList.add('flex'); overlay.classList.add('hidden');
+        } else { closeMenu(); }
+    });
+</script>
+</body>
+
+</html>

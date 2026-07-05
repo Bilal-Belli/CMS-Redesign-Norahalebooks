@@ -1,0 +1,90 @@
+<aside id="sidebar"
+    class="fixed inset-y-0 left-0 w-64 bg-white border-r border-gray-200 hidden flex-col justify-between py-4 overflow-y-auto shrink-0 z-40 md:relative md:flex">
+
+    <div class="flex justify-end px-4 mb-2 md:hidden">
+        <button id="menu-close" class="p-1 text-gray-500 hover:bg-gray-100 rounded-md">
+            <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+    </div>
+
+    <div class="space-y-1 px-3">
+        <a href="/dashboard"
+            class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-colors <%= activePage === 'dashboard' ? 'bg-gray-100 text-gray-900' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' %>">
+            <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+            Dashboard
+        </a>
+        <a href="/settings"
+            class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-colors <%= activePage === 'settings' ? 'bg-gray-100 text-gray-900' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' %>">
+            <i data-lucide="settings" class="w-5 h-5"></i>
+            Site Settings
+        </a>
+        <a href="/homepage"
+            class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors">
+            <i data-lucide="home" class="w-5 h-5"></i>
+            Homepage
+        </a>
+        <a href="/about-page"
+            class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors">
+            <i data-lucide="user" class="w-5 h-5"></i>
+            About Page
+        </a>
+        <a href="/books"
+            class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors">
+            <i data-lucide="library" class="w-5 h-5"></i>
+            Books
+        </a>
+        <a href="/benefits-page"
+            class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors">
+            <i data-lucide="heart" class="w-5 h-5"></i>
+            Benefits Page
+        </a>
+        <a href="/blog-posts"
+            class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors">
+            <i data-lucide="file-text" class="w-5 h-5"></i>
+            Blog Posts
+        </a>
+        <a href="/contact-page"
+            class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors">
+            <i data-lucide="mail" class="w-5 h-5"></i>
+            Contact Page
+        </a>
+        <a href="/favorites"
+            class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors">
+            <i data-lucide="sparkles" class="w-5 h-5"></i>
+            Favorites
+        </a>
+        <a href="/bonus-recipes"
+            class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors">
+            <i data-lucide="gift" class="w-5 h-5"></i>
+            Bonus Recipes
+        </a>
+        <a href="/arc-readers"
+            class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors">
+            <i data-lucide="users" class="w-5 h-5"></i>
+            ARC Readers
+        </a>
+        <a href="/images"
+            class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors">
+            <i data-lucide="image" class="w-5 h-5"></i>
+            Images
+        </a>
+        <a href="/subscribers"
+            class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors">
+            <i data-lucide="user-plus" class="w-5 h-5"></i>
+            Subscribers
+        </a>
+        <a href="/messages"
+            class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors">
+            <i data-lucide="message-square" class="w-5 h-5"></i>
+            Messages
+        </a>
+    </div>
+
+    <div class="px-3 border-t border-gray-100 pt-4 mt-4">
+        <a href="/admin/logout"
+            class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg text-red-600 hover:bg-red-50 transition-colors">
+            <i data-lucide="log-out" class="w-5 h-5"></i>
+            Sign Out
+        </a>
+    </div>
+</aside>

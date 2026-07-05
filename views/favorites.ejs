@@ -1,0 +1,179 @@
+<%- include('partials/header') %>
+<%- include('partials/sidebar') %>
+
+<main class="flex-1 overflow-y-auto p-4 md:p-8 space-y-10">
+
+    <!-- Flash Messages -->
+    <% if (success) { %>
+    <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg flex items-center gap-2">
+        <i data-lucide="check-circle" class="h-5 w-5 text-green-500"></i>
+        <span><%= success %></span>
+    </div>
+    <% } %>
+
+    <% if (error) { %>
+    <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-center gap-2">
+        <i data-lucide="alert-circle" class="h-5 w-5 text-red-500"></i>
+        <span><%= error %></span>
+    </div>
+    <% } %>
+
+    <div>
+        <h1 class="text-2xl md:text-3xl font-bold text-gray-900 mb-6">Favorites</h1>
+    </div>
+
+    <!-- Page Text Section -->
+    <section class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm space-y-6">
+        <span class="text-xs font-semibold uppercase tracking-wider text-gray-400 block">Page Text</span>
+
+        <form action="/favorites/save-text" method="POST" class="space-y-5">
+            <div class="space-y-1.5">
+                <label class="block text-sm font-medium text-gray-800">Page title</label>
+                <input type="text" name="page_title" value="<%= favoritesText.page_title %>"
+                    class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 bg-gray-50/50">
+            </div>
+
+            <div class="space-y-1.5">
+                <label class="block text-sm font-medium text-gray-800">Intro paragraph</label>
+                <textarea name="intro_paragraph" rows="3"
+                    class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 bg-gray-50/50 leading-relaxed"><%= favoritesText.intro_paragraph %></textarea>
+            </div>
+
+            <div class="space-y-1.5">
+                <label class="block text-sm font-medium text-gray-800">Affiliate disclosure (small text)</label>
+                <textarea name="affiliate_disclosure" rows="2"
+                    class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 bg-gray-50/50 text-gray-600 leading-relaxed"><%= favoritesText.affiliate_disclosure %></textarea>
+            </div>
+
+            <div class="pt-2">
+                <button type="submit"
+                    class="border border-gray-200 hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-lg text-xs font-medium shadow-sm transition-colors focus:outline-none">
+                    Save page text
+                </button>
+            </div>
+        </form>
+    </section>
+
+    <!-- Categories Section -->
+    <section class="space-y-4">
+        <span class="text-xs font-semibold uppercase tracking-wider text-gray-400 block">Categories</span>
+
+        <div class="space-y-2">
+            <% categories.forEach(category => { %>
+            <div class="flex items-center justify-between bg-white border border-gray-200 rounded-lg px-4 py-2.5 shadow-sm">
+                <span class="text-sm text-gray-800 font-medium"><%= category %></span>
+                <form action="/favorites/category/delete/<%= category %>" method="POST" onsubmit="return confirm('Delete this category?');">
+                    <button type="submit" class="text-gray-400 hover:text-red-500 transition-colors p-1">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    </button>
+                </form>
+            </div>
+            <% }) %>
+        </div>
+
+        <form action="/favorites/category/add" method="POST" class="flex gap-2 pt-2">
+            <input type="text" name="category_name" placeholder="New category name"
+                class="flex-1 px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 bg-white shadow-sm">
+            <button type="submit"
+                class="bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium shadow-sm transition-colors flex items-center gap-1.5 focus:outline-none">
+                <i data-lucide="plus" class="w-4 h-4 text-gray-500"></i> Add
+            </button>
+        </form>
+    </section>
+
+    <!-- Products Section -->
+    <section class="space-y-4 pb-16">
+        <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold uppercase tracking-wider text-gray-400 block">Products</span>
+            <a href="/favorites/product/new"
+                class="bg-[#335F55] hover:bg-[#284B43] text-white px-4 py-2 rounded-lg text-xs font-medium shadow-sm transition-colors flex items-center gap-1.5">
+                <i data-lucide="plus" class="w-3.5 h-3.5"></i> New Product
+            </a>
+        </div>
+
+        <div class="space-y-3">
+            <% if (products && products.length > 0) { %>
+                <% products.forEach(product => { %>
+                <div class="flex items-center justify-between bg-white border border-gray-200 rounded-xl p-3 shadow-sm hover:border-gray-300 transition-all">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-lg bg-gray-50 border border-gray-100 flex items-center justify-center overflow-hidden flex-shrink-0">
+                            <img src="<%= product.image_url %>" alt="<%= product.title %>" class="w-full h-full object-cover">
+                        </div>
+                        <div>
+                            <h4 class="text-sm font-semibold text-gray-900 leading-snug"><%= product.title %></h4>
+                            <p class="text-xs text-gray-400"><%= product.category %></p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-1 text-gray-400">
+                        <form action="/favorites/product/move-up/<%= product.id %>" method="POST">
+                            <button type="submit" class="p-1.5 hover:bg-gray-50 rounded-lg hover:text-gray-700 transition-colors">
+                                <i data-lucide="arrow-up" class="w-4 h-4"></i>
+                            </button>
+                        </form>
+                        <form action="/favorites/product/move-down/<%= product.id %>" method="POST">
+                            <button type="submit" class="p-1.5 hover:bg-gray-50 rounded-lg hover:text-gray-700 transition-colors">
+                                <i data-lucide="arrow-down" class="w-4 h-4"></i>
+                            </button>
+                        </form>
+                        <a href="/favorites/product/edit/<%= product.id %>"
+                            class="p-1.5 hover:bg-gray-50 rounded-lg hover:text-gray-700 transition-colors mx-1">
+                            <i data-lucide="file-text" class="w-4 h-4"></i>
+                        </a>
+                        <form action="/favorites/product/delete/<%= product.id %>" method="POST" onsubmit="return confirm('Delete this product?');">
+                            <button type="submit" class="p-1.5 hover:bg-gray-50 rounded-lg hover:text-red-500 transition-colors">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                <% }); %>
+            <% } else { %>
+                <div class="text-center py-8 bg-white border border-gray-200 rounded-xl">
+                    <p class="text-gray-500">No products added yet</p>
+                    <a href="/favorites/product/new" class="text-sm text-[#335F55] hover:underline mt-2 inline-block">
+                        Add your first product
+                    </a>
+                </div>
+            <% } %>
+        </div>
+    </section>
+
+</main>
+
+</div>
+<script>
+    lucide.createIcons();
+
+    const menuToggle = document.getElementById('menu-toggle');
+    const menuClose = document.getElementById('menu-close');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
+
+    function openMenu() { 
+        sidebar.classList.remove('hidden'); 
+        sidebar.classList.add('flex'); 
+        overlay.classList.remove('hidden'); 
+    }
+    
+    function closeMenu() { 
+        sidebar.classList.add('hidden'); 
+        sidebar.classList.remove('flex'); 
+        overlay.classList.add('hidden'); 
+    }
+
+    menuToggle.addEventListener('click', openMenu);
+    menuClose.addEventListener('click', closeMenu);
+    overlay.addEventListener('click', closeMenu);
+
+    window.addEventListener('resize', () => {
+        if (window.innerWidth >= 768) {
+            sidebar.classList.remove('hidden'); 
+            sidebar.classList.add('flex'); 
+            overlay.classList.add('hidden');
+        } else { 
+            closeMenu(); 
+        }
+    });
+</script>
+</body>
+</html>

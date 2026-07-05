@@ -1,0 +1,355 @@
+<%- include('partials/header') %>
+<%- include('partials/sidebar') %>
+
+<!-- Quill.js CSS -->
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+
+<style>
+    .ql-container {
+        font-size: 14px;
+        min-height: 200px;
+    }
+
+    .ql-editor {
+        min-height: 200px;
+    }
+
+    .ql-editor p {
+        margin-bottom: 0.75rem;
+    }
+
+    .ql-editor ul,
+    .ql-editor ol {
+        padding-left: 1.5rem;
+        margin: 0.5rem 0;
+    }
+
+    .ql-editor h2 {
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin: 0.5rem 0;
+    }
+
+    .ql-editor h3 {
+        font-size: 1.25rem;
+        font-weight: bold;
+        margin: 0.5rem 0;
+    }
+
+    .quill-wrapper {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.75rem;
+        overflow: hidden;
+        transition: all 0.2s;
+    }
+
+    .quill-wrapper:focus-within {
+        border-color: #059669;
+        box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
+    }
+
+    .ql-toolbar.ql-snow {
+        border: none;
+        border-bottom: 1px solid #e5e7eb;
+        background: #f8fafc;
+        padding: 0.5rem;
+        border-radius: 0.75rem 0.75rem 0 0;
+    }
+
+    .ql-container.ql-snow {
+        border: none;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.125rem 0.5rem;
+        border-radius: 9999px;
+        font-size: 0.625rem;
+        font-weight: 500;
+    }
+
+    .status-badge.published {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .status-badge.draft {
+        background: #f3f4f6;
+        color: #6b7280;
+    }
+</style>
+
+<main class="flex-1 overflow-y-auto p-4 md:p-8">
+
+    <!-- Flash Messages -->
+    <% if (success) { %>
+    <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg flex items-center gap-2 mb-6">
+        <i data-lucide="check-circle" class="h-5 w-5 text-green-500"></i>
+        <span><%= success %></span>
+    </div>
+    <% } %>
+
+    <% if (error) { %>
+    <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-center gap-2 mb-6">
+        <i data-lucide="alert-circle" class="h-5 w-5 text-red-500"></i>
+        <span><%= error %></span>
+    </div>
+    <% } %>
+
+    <% if (viewMode === 'list') { %>
+
+    <!-- Page Heading -->
+    <div class="flex items-center justify-between gap-4 mb-6 md:mb-8">
+        <div class="flex-1">
+            <form action="/blog-posts/update-heading" method="POST" class="flex items-center gap-3">
+                <input type="text" name="page_heading" value="<%= pageHeading || 'Latest Articles' %>"
+                    class="text-2xl md:text-3xl font-bold text-gray-900 bg-transparent border-b-2 border-transparent hover:border-gray-300 focus:border-emerald-500 focus:outline-none transition-colors px-1 py-0.5 w-auto min-w-[200px]">
+                <button type="submit" class="text-xs text-gray-400 hover:text-gray-600 transition-colors">
+                    <i data-lucide="save" class="w-4 h-4"></i>
+                </button>
+            </form>
+        </div>
+        <a href="/blog-posts/new"
+            class="inline-flex items-center gap-2 bg-[#335F55] hover:bg-[#284B43] text-white px-4 py-2 rounded-lg text-sm font-medium shadow-sm transition-colors shrink-0">
+            <i data-lucide="plus" class="w-4 h-4"></i> New Post
+        </a>
+    </div>
+
+    <!-- Posts List -->
+    <div class="space-y-4">
+        <% posts.forEach(post => { %>
+        <div
+            class="bg-white border border-gray-200 rounded-xl p-4 flex items-center justify-between gap-4 shadow-sm hover:border-gray-300 transition-all">
+            <div class="flex items-center gap-4 min-w-0 flex-1">
+                <div
+                    class="w-12 h-12 bg-gray-50 border border-gray-100 rounded-lg flex items-center justify-center shrink-0">
+                    <i data-lucide="file-text" class="w-5 h-5 text-gray-400"></i>
+                </div>
+                <div class="min-w-0 flex-1">
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <h2 class="font-semibold text-gray-900 truncate"><%= post.title %></h2>
+                        <span class="status-badge <%= post.is_published ? 'published' : 'draft' %>">
+                            <i data-lucide="<%= post.is_published ? 'eye' : 'eye-off' %>" class="w-3 h-3"></i>
+                            <%= post.is_published ? 'Published' : 'Draft' %>
+                        </span>
+                        <span
+                            class="text-xs text-gray-400 bg-gray-50 px-2 py-0.5 rounded-full"><%= post.category %></span>
+                    </div>
+                    <div class="flex items-center gap-3 text-xs text-gray-400 mt-0.5">
+                        <span><%= post.date %></span>
+                        <span>•</span>
+                        <span><%= post.read_time %></span>
+                        <span>•</span>
+                        <span class="font-mono truncate max-w-[150px]">/blog/<%= post.slug %></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-1 shrink-0">
+                <form action="/blog-posts/toggle-visibility/<%= post.id %>" method="POST" class="inline">
+                    <button type="submit"
+                        class="p-1.5 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-md transition-colors"
+                        title="Toggle visibility">
+                        <i data-lucide="<%= post.is_published ? 'eye' : 'eye-off' %>" class="w-4 h-4"></i>
+                    </button>
+                </form>
+                <a href="/blog-posts/edit/<%= post.id %>"
+                    class="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
+                    title="Edit Post">
+                    <i data-lucide="file-text" class="w-4 h-4"></i>
+                </a>
+                <form action="/blog-posts/delete/<%= post.id %>" method="POST"
+                    onsubmit="return confirm('Delete this post?');" class="inline">
+                    <button type="submit"
+                        class="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
+                        title="Delete Post">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+        <% }) %>
+
+        <% if (posts.length === 0) { %>
+        <div class="text-center py-12 border border-dashed border-gray-200 rounded-xl bg-white text-gray-400">
+            <i data-lucide="file-text" class="w-12 h-12 mx-auto mb-3 text-gray-300"></i>
+            <p class="text-sm">No posts created yet. Click "New Post" to get started.</p>
+        </div>
+        <% } %>
+    </div>
+
+    <% } else if (viewMode === 'edit') { %>
+
+    <div class="flex items-center justify-between gap-4 mb-6 md:mb-8">
+        <h1 class="text-2xl font-bold text-gray-900"><%= isEdit ? 'Edit Post' : 'New Post' %></h1>
+        <a href="/blog-posts"
+            class="bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium shadow-sm transition-colors">Cancel</a>
+    </div>
+
+    <form action="/blog-posts/save" method="POST"
+        class="space-y-6 bg-white border border-gray-200 rounded-xl p-6 shadow-sm pb-12">
+        <input type="hidden" name="id" value="<%= isEdit ? post.id : '' %>">
+
+        <!-- Title -->
+        <div class="space-y-1.5">
+            <label class="block text-sm font-medium text-gray-900">Title</label>
+            <input type="text" name="title" value="<%= isEdit ? post.title : '' %>" required
+                class="w-full bg-[#F8FAFC] border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition-all">
+        </div>
+
+        <!-- Slug -->
+        <div class="space-y-1.5">
+            <label class="block text-sm font-medium text-gray-900">URL slug</label>
+            <input type="text" name="slug" value="<%= isEdit ? post.slug : '' %>" required
+                class="w-full bg-[#F8FAFC] border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition-all font-mono">
+            <p class="text-xs text-gray-400 mt-1">URL path, e.g., /blog/my-article</p>
+        </div>
+
+        <!-- Category -->
+        <div class="space-y-1.5">
+            <label class="block text-sm font-medium text-gray-900">Category</label>
+            <div class="flex gap-2">
+                <input type="text" name="category_new" placeholder="Category name"
+                    class="w-48 bg-[#F8FAFC] border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition-all"
+                    onchange="this.form.category.value = this.value">
+            </div>
+        </div>
+
+        <!-- Date & Read Time -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="space-y-1.5">
+                <label class="block text-sm font-medium text-gray-900">Date</label>
+                <input type="date" name="date"
+                    value="<%= isEdit ? post.date : new Date().toISOString().split('T')[0] %>"
+                    class="w-full bg-[#F8FAFC] border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition-all">
+            </div>
+            <div class="space-y-1.5">
+                <label class="block text-sm font-medium text-gray-900">Read Time</label>
+                <input type="text" name="read_time" value="<%= isEdit ? post.read_time : '5 min read' %>"
+                    class="w-full bg-[#F8FAFC] border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition-all">
+            </div>
+        </div>
+
+        <!-- Excerpt -->
+        <div class="space-y-1.5">
+            <label class="block text-sm font-medium text-gray-900">Excerpt</label>
+            <p class="text-xs text-gray-400">Short summary shown in blog listings.</p>
+            <textarea name="excerpt" rows="3"
+                class="w-full bg-[#F8FAFC] border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition-all resize-y"><%= isEdit ? post.excerpt : '' %></textarea>
+        </div>
+
+        <!-- Description (Quill Editor) -->
+        <div class="space-y-1.5">
+            <label class="block text-sm font-medium text-gray-900">Description (Content)</label>
+            <p class="text-xs text-gray-400">Press Enter for new paragraphs. Bold, italic, lists, and links are
+                supported.</p>
+            <div class="quill-wrapper">
+                <div id="descriptionEditor"></div>
+            </div>
+            <input type="hidden" name="description" id="descriptionInput" value='<%= isEdit ? post.description : '' %>'>
+        </div>
+
+        <!-- Published Status -->
+        <div class="pt-2 flex items-center justify-between">
+            <label class="flex items-center gap-3 cursor-pointer select-none">
+                <input type="checkbox" name="is_published" <%= (isEdit && post.is_published) ? 'checked' : '' %>
+                    class="w-4 h-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500/30 cursor-pointer">
+                <span class="text-sm font-medium text-gray-900">Published</span>
+            </label>
+        </div>
+
+        <div class="pt-4 border-t border-gray-100 flex items-center justify-end gap-3">
+            <a href="/blog-posts"
+                class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-5 py-2.5 rounded-lg text-sm font-medium transition-colors">
+                Cancel
+            </a>
+            <button type="submit"
+                class="bg-[#335F55] hover:bg-[#284B43] text-white px-6 py-2.5 rounded-lg text-sm font-medium tracking-wide shadow-sm transition-colors focus:outline-none">
+                <%= isEdit ? 'Save Changes' : 'Create Post' %>
+            </button>
+        </div>
+    </form>
+    <% } %>
+
+</main>
+
+</div>
+
+<!-- Quill.js JS -->
+<script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+
+<script>
+    lucide.createIcons();
+
+    // ============ INITIALIZE QUILL EDITOR ============
+
+    const toolbarOptions = [
+        ['bold', 'italic', 'underline', 'strike'],
+        ['blockquote', 'code-block'],
+        [{ 'header': [1, 2, 3, false] }],
+        [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+        [{ 'indent': '-1' }, { 'indent': '+1' }],
+        ['link', 'image'],
+        ['clean']
+    ];
+
+    const container = document.getElementById('descriptionEditor');
+    const input = document.getElementById('descriptionInput');
+
+    if (container) {
+        const quill = new Quill(container, {
+            modules: { toolbar: toolbarOptions },
+            theme: 'snow',
+            placeholder: 'Write your blog post content here...'
+        });
+
+        if (input && input.value) {
+            quill.root.innerHTML = input.value;
+        }
+
+        quill.on('text-change', function () {
+            if (input) {
+                input.value = quill.root.innerHTML;
+            }
+        });
+    }
+
+    // ============ SIDEBAR FUNCTIONS ============
+
+    const menuToggle = document.getElementById('menu-toggle');
+    const menuClose = document.getElementById('menu-close');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
+
+    function openMenu() {
+        sidebar.classList.remove('hidden');
+        sidebar.classList.add('flex');
+        overlay.classList.remove('hidden');
+    }
+
+    function closeMenu() {
+        sidebar.classList.add('hidden');
+        sidebar.classList.remove('flex');
+        overlay.classList.add('hidden');
+    }
+
+    menuToggle?.addEventListener('click', openMenu);
+    menuClose?.addEventListener('click', closeMenu);
+    overlay?.addEventListener('click', closeMenu);
+
+    window.addEventListener('resize', () => {
+        if (window.innerWidth >= 768) {
+            sidebar.classList.remove('hidden');
+            sidebar.classList.add('flex');
+            overlay.classList.add('hidden');
+        } else {
+            closeMenu();
+        }
+    });
+</script>
+</body>
+
+</html>

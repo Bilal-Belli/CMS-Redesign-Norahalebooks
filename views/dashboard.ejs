@@ -1,0 +1,171 @@
+<%- include('partials/header') %>
+<%- include('partials/sidebar') %>
+
+<main class="flex-1 overflow-y-auto p-4 md:p-8">
+    <h1 class="text-2xl md:text-3xl font-bold text-gray-900 mb-6 md:mb-8">Dashboard</h1>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+
+        <a href="/settings"
+            class="block bg-white p-5 md:p-6 rounded-xl border border-gray-200 hover:shadow-md hover:border-gray-300 transition-all">
+            <div class="flex items-center gap-3 mb-2">
+                <div class="p-2 bg-emerald-50 rounded-lg text-emerald-600">
+                    <i data-lucide="settings" class="w-5 h-5"></i>
+                </div>
+                <h2 class="font-semibold text-gray-900">Site Settings</h2>
+            </div>
+            <p class="text-sm text-gray-500 pl-11">Logo, tagline, OG metadata</p>
+        </a>
+
+        <a href="/homepage"
+            class="block bg-white p-5 md:p-6 rounded-xl border border-gray-200 hover:shadow-md hover:border-gray-300 transition-all">
+            <div class="flex items-center gap-3 mb-2">
+                <div class="p-2 bg-teal-50 rounded-lg text-teal-600">
+                    <i data-lucide="home" class="w-5 h-5"></i>
+                </div>
+                <h2 class="font-semibold text-gray-900">Homepage</h2>
+            </div>
+            <p class="text-sm text-gray-500 pl-11">Hero, book showcase, bio</p>
+        </a>
+
+        <a href="/about-page"
+            class="block bg-white p-5 md:p-6 rounded-xl border border-gray-200 hover:shadow-md hover:border-gray-300 transition-all">
+            <div class="flex items-center gap-3 mb-2">
+                <div class="p-2 bg-blue-50 rounded-lg text-blue-600">
+                    <i data-lucide="user" class="w-5 h-5"></i>
+                </div>
+                <h2 class="font-semibold text-gray-900">About Page</h2>
+            </div>
+            <p class="text-sm text-gray-500 pl-11">Full author biography</p>
+        </a>
+
+        <a href="/books"
+            class="block bg-white p-5 md:p-6 rounded-xl border border-gray-200 hover:shadow-md hover:border-gray-300 transition-all">
+            <div class="flex items-center gap-3 mb-2">
+                <div class="p-2 bg-slate-50 rounded-lg text-slate-600">
+                    <i data-lucide="library" class="w-5 h-5"></i>
+                </div>
+                <h2 class="font-semibold text-gray-900">Books</h2>
+            </div>
+            <p class="text-sm text-gray-500 pl-11">Description, chapters, buy links</p>
+        </a>
+
+        <a href="/benefits-page"
+            class="block bg-white p-5 md:p-6 rounded-xl border border-gray-200 hover:shadow-md hover:border-gray-300 transition-all">
+            <div class="flex items-center gap-3 mb-2">
+                <div class="p-2 bg-rose-50 rounded-lg text-rose-600">
+                    <i data-lucide="heart" class="w-5 h-5"></i>
+                </div>
+                <h2 class="font-semibold text-gray-900">Benefits Page</h2>
+            </div>
+            <p class="text-sm text-gray-500 pl-11">Benefit sections & FAQs</p>
+        </a>
+
+        <a href="/blog-posts"
+            class="block bg-white p-5 md:p-6 rounded-xl border border-gray-200 hover:shadow-md hover:border-gray-300 transition-all">
+            <div class="flex items-center gap-3 mb-2">
+                <div class="p-2 bg-cyan-50 rounded-lg text-cyan-600">
+                    <i data-lucide="file-text" class="w-5 h-5"></i>
+                </div>
+                <h2 class="font-semibold text-gray-900">Blog Posts</h2>
+            </div>
+            <p class="text-sm text-gray-500 pl-11">Create, edit, publish articles</p>
+        </a>
+
+        <a href="/contact-page"
+            class="block bg-white p-5 md:p-6 rounded-xl border border-gray-200 hover:shadow-md hover:border-gray-300 transition-all">
+            <div class="flex items-center gap-3 mb-2">
+                <div class="p-2 bg-emerald-50 rounded-lg text-emerald-600">
+                    <i data-lucide="mail" class="w-5 h-5"></i>
+                </div>
+                <h2 class="font-semibold text-gray-900">Contact Page</h2>
+            </div>
+            <p class="text-sm text-gray-500 pl-11">Intro text for contact form</p>
+        </a>
+
+        <a href="/favorites"
+            class="block bg-white p-5 md:p-6 rounded-xl border border-gray-200 hover:shadow-md hover:border-gray-300 transition-all">
+            <div class="flex items-center gap-3 mb-2">
+                <div class="p-2 bg-amber-50 rounded-lg text-amber-600">
+                    <i data-lucide="sparkles" class="w-5 h-5"></i>
+                </div>
+                <h2 class="font-semibold text-gray-900">Favorites</h2>
+            </div>
+            <p class="text-sm text-gray-500 pl-11">Recommended products & links</p>
+        </a>
+
+        <a href="/images"
+            class="block bg-white p-5 md:p-6 rounded-xl border border-gray-200 hover:shadow-md hover:border-gray-300 transition-all">
+            <div class="flex items-center gap-3 mb-2">
+                <div class="p-2 bg-indigo-50 rounded-lg text-indigo-600">
+                    <i data-lucide="image" class="w-5 h-5"></i>
+                </div>
+                <h2 class="font-semibold text-gray-900">Images</h2>
+            </div>
+            <p class="text-sm text-gray-500 pl-11">Upload & manage images</p>
+        </a>
+
+        <a href="/subscribers"
+            class="block bg-white p-5 md:p-6 rounded-xl border border-gray-200 hover:shadow-md hover:border-gray-300 transition-all">
+            <div class="flex items-center gap-3 mb-2">
+                <div class="p-2 bg-sky-50 rounded-lg text-sky-600">
+                    <i data-lucide="user-plus" class="w-5 h-5"></i>
+                </div>
+                <h2 class="font-semibold text-gray-900">Subscribers</h2>
+            </div>
+            <p class="text-sm text-gray-500 pl-11">Newsletter list & CSV export</p>
+        </a>
+
+        <a href="/messages"
+            class="block bg-white p-5 md:p-6 rounded-xl border border-gray-200 hover:shadow-md hover:border-gray-300 transition-all">
+            <div class="flex items-center gap-3 mb-2">
+                <div class="p-2 bg-stone-50 rounded-lg text-stone-600">
+                    <i data-lucide="message-square" class="w-5 h-5"></i>
+                </div>
+                <h2 class="font-semibold text-gray-900">Messages</h2>
+            </div>
+            <p class="text-sm text-gray-500 pl-11">Contact form submissions</p>
+        </a>
+
+    </div>
+</main>
+
+</div>
+<script>
+    lucide.createIcons();
+
+    const menuToggle = document.getElementById('menu-toggle');
+    const menuClose = document.getElementById('menu-close');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
+
+    function openMenu() {
+        sidebar.classList.remove('hidden');
+        sidebar.classList.add('flex');
+        overlay.classList.remove('hidden');
+    }
+
+    function closeMenu() {
+        sidebar.classList.add('hidden');
+        sidebar.classList.remove('flex');
+        overlay.classList.add('hidden');
+    }
+
+    menuToggle.addEventListener('click', openMenu);
+    menuClose.addEventListener('click', closeMenu);
+    overlay.addEventListener('click', closeMenu);
+
+    // Handle screen resize events cleanly
+    window.addEventListener('resize', () => {
+        if (window.innerWidth >= 768) { // 768px is Tailwind's default 'md:' breakpoint
+            sidebar.classList.remove('hidden');
+            sidebar.classList.add('flex');
+            overlay.classList.add('hidden');
+        } else {
+            closeMenu();
+        }
+    });
+</script>
+</body>
+
+</html>

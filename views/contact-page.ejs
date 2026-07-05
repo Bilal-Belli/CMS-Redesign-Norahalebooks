@@ -1,0 +1,360 @@
+<%- include('partials/header') %>
+<%- include('partials/sidebar') %>
+
+<!-- Quill.js CSS -->
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+
+<style>
+    .ql-container {
+        font-size: 14px;
+        min-height: 100px;
+    }
+
+    .ql-editor {
+        min-height: 100px;
+    }
+
+    .ql-editor p {
+        margin-bottom: 0.75rem;
+    }
+
+    .ql-editor ul,
+    .ql-editor ol {
+        padding-left: 1.5rem;
+        margin: 0.5rem 0;
+    }
+
+    .quill-wrapper {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.75rem;
+        overflow: hidden;
+        transition: all 0.2s;
+    }
+
+    .quill-wrapper:focus-within {
+        border-color: #059669;
+        box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
+    }
+
+    .ql-toolbar.ql-snow {
+        border: none;
+        border-bottom: 1px solid #e5e7eb;
+        background: #f8fafc;
+        padding: 0.5rem;
+        border-radius: 0.75rem 0.75rem 0 0;
+    }
+
+    .ql-container.ql-snow {
+        border: none;
+    }
+
+    .image-select-card {
+        border: 3px solid transparent;
+        cursor: pointer;
+        transition: all 0.2s;
+        border-radius: 0.75rem;
+        overflow: hidden;
+    }
+
+    .image-select-card.selected {
+        border-color: #059669;
+        box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.2);
+    }
+
+    .image-select-card:hover {
+        transform: scale(1.02);
+    }
+</style>
+
+<main class="flex-1 overflow-y-auto p-4 md:p-8 space-y-10">
+
+    <div>
+        <h1 class="text-2xl md:text-3xl font-bold text-gray-900">Contact Page</h1>
+    </div>
+
+    <!-- Flash Messages -->
+    <% if (success) { %>
+    <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg flex items-center gap-2">
+        <i data-lucide="check-circle" class="h-5 w-5 text-green-500"></i>
+        <span><%= success %></span>
+    </div>
+    <% } %>
+
+    <% if (error) { %>
+    <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-center gap-2">
+        <i data-lucide="alert-circle" class="h-5 w-5 text-red-500"></i>
+        <span><%= error %></span>
+    </div>
+    <% } %>
+
+    <form action="/contact-page/save" method="POST" class="space-y-8 pb-16">
+
+        <!-- Page Text Section -->
+        <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm space-y-5">
+            <div class="space-y-1.5">
+                <label class="block text-sm font-medium text-gray-900">Page title</label>
+                <input type="text" name="page_title" value="<%= data.page_title %>"
+                    class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 bg-[#F8FAFC]">
+            </div>
+
+            <div class="space-y-1.5">
+                <label class="block text-sm font-medium text-gray-900">Intro paragraph</label>
+                <p class="text-xs text-gray-400 mb-1">Bold, italic, lists, and links are supported.</p>
+                <div class="quill-wrapper">
+                    <div id="introEditor"></div>
+                </div>
+                <input type="hidden" name="intro_paragraph" id="introInput" value='<%= data.intro_paragraph %>'>
+            </div>
+
+            <div class="space-y-1.5">
+                <label class="block text-sm font-medium text-gray-900">Let's Connect Note</label>
+                <p class="text-xs text-gray-400 mb-1">Shown below the intro paragraph. Bold, italic, lists, and links
+                    are supported.</p>
+                <div class="quill-wrapper">
+                    <div id="connectNoteEditor"></div>
+                </div>
+                <input type="hidden" name="lets_connect_note" id="connectNoteInput"
+                    value='<%= data.lets_connect_note %>'>
+            </div>
+        </div>
+
+        <!-- Photo Strip Section -->
+        <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm space-y-4">
+            <div>
+                <span class="text-xs font-semibold uppercase tracking-wider text-gray-400 block">Photo Strip (up to
+                    5)</span>
+                <p class="text-xs text-gray-400 mt-1">Select up to 5 images from your uploaded images to display as a
+                    strip.</p>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+                <% if (images && images.length > 0) { %>
+                <% images.forEach(image => { %>
+                <label
+                    class="image-select-card <%= data.photo_strip && data.photo_strip.includes(image.path) ? 'selected' : '' %>">
+                    <input type="checkbox" name="photo_strip" value="<%= image.path %>"
+                        <%= data.photo_strip && data.photo_strip.includes(image.path) ? 'checked' : '' %> class="hidden"
+                        onchange="this.closest('.image-select-card').classList.toggle('selected')">
+                    <img src="<%= image.path %>" alt="<%= image.originalName %>"
+                        class="w-full aspect-square object-cover">
+                </label>
+                <% }) %>
+                <% } else { %>
+                <div class="col-span-full text-center py-8 text-gray-400">
+                    <i data-lucide="image" class="w-8 h-8 mx-auto mb-2"></i>
+                    <p class="text-sm">No images uploaded yet</p>
+                    <a href="/images" class="text-xs text-[#335F55] hover:underline">Upload images first</a>
+                </div>
+                <% } %>
+            </div>
+
+            <% if (data.photo_strip && data.photo_strip.length > 5) { %>
+            <p class="text-xs text-red-500 mt-2">⚠️ Maximum 5 images selected. Uncheck some to save.</p>
+            <% } %>
+        </div>
+
+        <!-- FAQs Section -->
+        <div class="space-y-4">
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-semibold uppercase tracking-wider text-gray-400 block">Frequently Asked
+                    Questions</span>
+            </div>
+
+            <div id="faq-container" class="space-y-4">
+                <% data.faqs && data.faqs.forEach((faq, index) => { %>
+                <div class="bg-white border border-gray-200 rounded-xl p-5 shadow-sm flex gap-4 items-start group relative"
+                    data-id="<%= faq.id %>">
+                    <div class="flex-1 space-y-3">
+                        <div class="space-y-1">
+                            <label class="text-xs font-medium text-gray-400">Question</label>
+                            <input type="text" name="faq[<%= index %>][question]" value="<%= faq.question %>"
+                                class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none bg-white">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-xs font-medium text-gray-400">Answer</label>
+                            <textarea name="faq[<%= index %>][answer]" rows="2"
+                                class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none bg-white leading-relaxed"><%= faq.answer %></textarea>
+                        </div>
+                    </div>
+                    <div class="flex flex-col items-center gap-1 text-gray-400 pt-5">
+                        <form action="/contact-page/faq/move-up/<%= faq.id %>" method="POST" class="inline">
+                            <button type="submit"
+                                class="p-1.5 hover:bg-gray-50 rounded-md hover:text-gray-700 transition-colors">
+                                <i data-lucide="arrow-up" class="w-4 h-4"></i>
+                            </button>
+                        </form>
+                        <form action="/contact-page/faq/move-down/<%= faq.id %>" method="POST" class="inline">
+                            <button type="submit"
+                                class="p-1.5 hover:bg-gray-50 rounded-md hover:text-gray-700 transition-colors">
+                                <i data-lucide="arrow-down" class="w-4 h-4"></i>
+                            </button>
+                        </form>
+                        <form action="/contact-page/faq/delete/<%= faq.id %>" method="POST" class="inline"
+                            onsubmit="return confirm('Delete this FAQ?');">
+                            <button type="submit"
+                                class="p-1.5 hover:bg-red-50 rounded-md hover:text-red-500 transition-colors mt-1">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                <% }); %>
+            </div>
+
+            <button type="button" id="add-faq-btn"
+                class="bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium shadow-sm transition-colors flex items-center gap-1.5 focus:outline-none">
+                <i data-lucide="plus" class="w-4 h-4 text-gray-500"></i> Add FAQ
+            </button>
+        </div>
+
+        <div class="pt-4">
+            <button type="submit"
+                class="bg-[#335F55] hover:bg-[#284B43] text-white px-5 py-2.5 rounded-lg text-sm font-medium tracking-wide shadow-sm transition-colors focus:outline-none">
+                Save Contact Page
+            </button>
+        </div>
+
+    </form>
+</main>
+
+</div>
+
+<!-- Quill.js JS -->
+<script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+
+<script>
+    lucide.createIcons();
+
+    // ============ INITIALIZE QUILL EDITORS ============
+
+    const toolbarOptions = [
+        ['bold', 'italic', 'underline', 'strike'],
+        ['blockquote'],
+        [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+        ['link'],
+        ['clean']
+    ];
+
+    function initQuill(containerId, inputId, placeholder = '') {
+        const container = document.getElementById(containerId);
+        const input = document.getElementById(inputId);
+
+        if (!container || !input) return null;
+
+        const quill = new Quill(container, {
+            modules: { toolbar: toolbarOptions },
+            theme: 'snow',
+            placeholder: placeholder
+        });
+
+        if (input.value) {
+            quill.root.innerHTML = input.value;
+        }
+
+        quill.on('text-change', function () {
+            input.value = quill.root.innerHTML;
+        });
+
+        return quill;
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        initQuill('introEditor', 'introInput', 'Write your intro paragraph...');
+        initQuill('connectNoteEditor', 'connectNoteInput', 'Write your connect note...');
+        lucide.createIcons();
+    });
+
+    // ============ FAQ MANAGEMENT ============
+
+    const faqContainer = document.getElementById('faq-container');
+    const addFaqBtn = document.getElementById('add-faq-btn');
+
+    if (addFaqBtn && faqContainer) {
+        addFaqBtn.addEventListener('click', () => {
+            const currentItemsCount = faqContainer.querySelectorAll('.group').length;
+
+            const faqCardMarkup = `
+            <div class="bg-white border border-gray-200 rounded-xl p-5 shadow-sm flex gap-4 items-start group relative">
+                <div class="flex-1 space-y-3">
+                    <div class="space-y-1">
+                        <label class="text-xs font-medium text-gray-400">Question</label>
+                        <input type="text" name="faq[\${currentItemsCount}][question]" placeholder="Enter question text..." 
+                            class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none bg-white">
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-xs font-medium text-gray-400">Answer</label>
+                        <textarea name="faq[\${currentItemsCount}][answer]" rows="2" placeholder="Enter answer details..." 
+                            class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none bg-white leading-relaxed"></textarea>
+                    </div>
+                </div>
+                <div class="flex flex-col items-center gap-1 text-gray-400 pt-5">
+                    <button type="button" class="p-1.5 hover:bg-gray-50 rounded-md hover:text-gray-700 transition-colors faq-move-up">
+                        <i data-lucide="arrow-up" class="w-4 h-4"></i>
+                    </button>
+                    <button type="button" class="p-1.5 hover:bg-gray-50 rounded-md hover:text-gray-700 transition-colors faq-move-down">
+                        <i data-lucide="arrow-down" class="w-4 h-4"></i>
+                    </button>
+                    <button type="button" onclick="this.closest('.group').remove()" 
+                        class="p-1.5 hover:bg-red-50 rounded-md hover:text-red-500 transition-colors mt-1">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+            `;
+
+            faqContainer.insertAdjacentHTML('beforeend', faqCardMarkup);
+            lucide.createIcons();
+        });
+    }
+
+    // ============ PHOTO STRIP SELECTION ============
+
+    // Limit photo strip selection to 5
+    document.querySelectorAll('input[name="photo_strip"]').forEach(checkbox => {
+        checkbox.addEventListener('change', function () {
+            const checked = document.querySelectorAll('input[name="photo_strip"]:checked');
+            if (checked.length > 5) {
+                this.checked = false;
+                this.closest('.image-select-card').classList.remove('selected');
+                alert('Maximum 5 images can be selected for the photo strip.');
+            }
+        });
+    });
+
+    // ============ SIDEBAR FUNCTIONS ============
+
+    const menuToggle = document.getElementById('menu-toggle');
+    const menuClose = document.getElementById('menu-close');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
+
+    function openMenu() {
+        sidebar.classList.remove('hidden');
+        sidebar.classList.add('flex');
+        overlay.classList.remove('hidden');
+    }
+
+    function closeMenu() {
+        sidebar.classList.add('hidden');
+        sidebar.classList.remove('flex');
+        overlay.classList.add('hidden');
+    }
+
+    menuToggle?.addEventListener('click', openMenu);
+    menuClose?.addEventListener('click', closeMenu);
+    overlay?.addEventListener('click', closeMenu);
+
+    window.addEventListener('resize', () => {
+        if (window.innerWidth >= 768) {
+            sidebar.classList.remove('hidden');
+            sidebar.classList.add('flex');
+            overlay.classList.add('hidden');
+        } else {
+            closeMenu();
+        }
+    });
+</script>
+</body>
+
+</html>
