@@ -6,19 +6,12 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title><%= title || settings?.siteTitle || 'Nora Hale Books' %></title>
         <link rel="icon" type="image/png" href="/favicon.png">
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
         <script src="https://cdn.tailwindcss.com"></script>
         <script src="https://unpkg.com/lucide@latest"></script>
         <style>
             body {
-                font-family: 'Plus Jakarta Sans', sans-serif;
-                background: #faf9f6;
-            }
-
-            .serif-title {
-                font-family: 'Playfair Display', serif;
+                background: #F6F9F8;
             }
 
             .blog-content h2 {
@@ -107,16 +100,16 @@
 
     <body>
         <!-- Header -->
-<header class="sticky top-0 z-50 bg-white/75 backdrop-blur border-b border-gray-200">
+<header class="sticky top-0 z-50 bg-[#F6F9F8]/75 backdrop-blur border-b border-gray-200">
 
-    <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+    <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between ">
 
-        <a href="/" class="serif-title text-2xl font-bold text-gray-900">
+        <a href="/" class=" text-2xl font-bold text-gray-900">
             <img src="/home-logo.png" alt="Nora Hale Books Logo" class="h-14 w-auto">
         </a>
 
         <!-- Desktop -->
-        <nav class="hidden md:flex items-center gap-7 text-sm font-medium text-gray-600">
+        <nav class="hidden md:flex items-center gap-7 text-sm font-medium text-gray-600 ">
             <a href="/" class="hover:text-emerald-700 transition">Home</a>
             <a href="/about" class="hover:text-emerald-700 transition">About Nora</a>
             <a href="/books" class="hover:text-emerald-700 transition">Books</a>
