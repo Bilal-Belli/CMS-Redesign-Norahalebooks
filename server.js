@@ -10,6 +10,9 @@ require('dotenv').config();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Public directory for static files
+app.use(express.static('public'));
+
 // Session configuration - SIMPLIFIED AND FIXED
 app.use(session({
     secret: process.env.SESSION_SECRET,
@@ -28,35 +31,73 @@ app.set('views', path.join(__dirname, 'views'));
 // Serve static files
 app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 
-// Ensure directories exist
+// Path to data files and directories
 const uploadDir = path.join(__dirname, 'public/uploads');
 const dataDir = path.join(__dirname, 'data');
 const imagesDataFile = path.join(__dirname, 'data', 'images.json');
+const blogPostsDataFile = path.join(__dirname, 'data', 'blog-posts.json');
+const benefitsDataFile = path.join(__dirname, 'data', 'benefits.json');
+const recipesDataFile = path.join(__dirname, 'data', 'recipes.json');
+const settingsDataFile = path.join(__dirname, 'data', 'settings.json');
+const messagesDataFile = path.join(__dirname, 'data', 'messages.json');
+const booksDataFile = path.join(__dirname, 'data', 'books.json');
+const arcReadersDataFile = path.join(__dirname, 'data', 'arc-readers.json');
+const bonusRecipesDataFile = path.join(__dirname, 'data', 'bonus-recipes.json');
+const favoritesDataFile = path.join(__dirname, 'data', 'favorites.json');
+const contactDataFile = path.join(__dirname, 'data', 'contact.json');
+const homepageDataFile = path.join(__dirname, 'data', 'homepage.json');
+const aboutDataFile = path.join(__dirname, 'data', 'about.json');
 
+// Check Data Directories
 if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });
 }
 if (!fs.existsSync(dataDir)) {
     fs.mkdirSync(dataDir, { recursive: true });
 }
+
+// Check Data Files
 if (!fs.existsSync(imagesDataFile)) {
     fs.writeFileSync(imagesDataFile, JSON.stringify([]));
 }
+if (!fs.existsSync(blogPostsDataFile)) {
+    fs.writeFileSync(blogPostsDataFile, JSON.stringify([]));
+}
+if (!fs.existsSync(benefitsDataFile)) {
+    fs.writeFileSync(benefitsDataFile, JSON.stringify([]));
+}
+if (!fs.existsSync(recipesDataFile)) {
+    fs.writeFileSync(recipesDataFile, JSON.stringify([]));
+}
+if (!fs.existsSync(settingsDataFile)) {
+    fs.writeFileSync(settingsDataFile, JSON.stringify([]));
+}
+if (!fs.existsSync(messagesDataFile)) {
+    fs.writeFileSync(messagesDataFile, JSON.stringify([]));
+}
+if (!fs.existsSync(booksDataFile)) {
+    fs.writeFileSync(booksDataFile, JSON.stringify([]));
+}
+if (!fs.existsSync(arcReadersDataFile)) {
+    fs.writeFileSync(arcReadersDataFile, JSON.stringify([]));
+}
+if (!fs.existsSync(bonusRecipesDataFile)) {
+    fs.writeFileSync(bonusRecipesDataFile, JSON.stringify([]));
+}
+if (!fs.existsSync(favoritesDataFile)) {
+    fs.writeFileSync(favoritesDataFile, JSON.stringify([]));
+}
+if (!fs.existsSync(contactDataFile)) {
+    fs.writeFileSync(contactDataFile, JSON.stringify([]));
+}
+if (!fs.existsSync(homepageDataFile)) {
+    fs.writeFileSync(homepageDataFile, JSON.stringify([]));
+}
+if (!fs.existsSync(aboutDataFile)) {
+    fs.writeFileSync(aboutDataFile, JSON.stringify([]));
+}
 
-// Helper functions
-const getImages = () => {
-    try {
-        return JSON.parse(fs.readFileSync(imagesDataFile, 'utf8'));
-    } catch {
-        return [];
-    }
-};
-
-const saveImages = (images) => {
-    fs.writeFileSync(imagesDataFile, JSON.stringify(images, null, 2));
-};
-
-// Configure multer
+// Multer upload images to disk
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, uploadDir);
@@ -80,16 +121,43 @@ const upload = multer({
     }
 });
 
-// Mock users
-const users = [
-    {
-        id: 1,
-        email: 'admin@example.com',
-        password: 'admin123'
-    }
-];
+const homepageUpload = multer({
+    storage: multer.diskStorage({
+        destination: (req, file, cb) => {
+            const uploadDir = path.join(__dirname, 'public/uploads');
+            if (!fs.existsSync(uploadDir)) {
+                fs.mkdirSync(uploadDir, { recursive: true });
+            }
+            cb(null, uploadDir);
+        },
+        filename: (req, file, cb) => {
+            const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+            cb(null, 'homepage-' + uniqueSuffix + path.extname(file.originalname));
+        }
+    }),
+    fileFilter: (req, file, cb) => {
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+        if (allowedTypes.includes(file.mimetype)) {
+            cb(null, true);
+        } else {
+            cb(new Error('Only images are allowed'), false);
+        }
+    },
+    limits: { fileSize: 5 * 1024 * 1024 }
+});
 
-// Auth middleware
+const readJsonFile = (filePath, fallback) => {
+    try {
+        return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    } catch {
+        return fallback;
+    }
+};
+
+const writeJsonFile = (filePath, data) => {
+    fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+};
+
 const isAuthenticated = (req, res, next) => {
     if (req.session && req.session.user) {
         next();
@@ -98,10 +166,186 @@ const isAuthenticated = (req, res, next) => {
     }
 };
 
-// ============ ROUTES ============
+const deleteImageFile = (imagePath) => {
+    if (!imagePath) return;
+    const filename = path.basename(imagePath);
+    const filePath = path.join(__dirname, 'public', imagePath);
 
-// Root
+    if (fs.existsSync(filePath)) {
+        try {
+            fs.unlinkSync(filePath);
+        } catch (err) {
+            console.error(`Failed to delete old image: ${err.message}`);
+        }
+    }
+};
+
+const getCategories = () => {
+    const data = readJsonFile(blogPostsDataFile, []);
+    const categories = data.posts.map(p => p.category).filter(Boolean);
+    return [...new Set(categories)];
+};
+
+const saveBase64Image = (base64Data) => {
+    const matches = base64Data.match(/^data:image\/([A-Za-z]+);base64,(.+)$/);
+    if (!matches || matches.length !== 3) {
+        throw new Error('Invalid base64 data');
+    }
+
+    const ext = matches[1];
+    const data = Buffer.from(matches[2], 'base64');
+    const filename = 'about-' + Date.now() + '-' + Math.round(Math.random() * 1E9) + '.' + ext;
+    const filePath = path.join(__dirname, 'public/uploads', filename);
+
+    fs.writeFileSync(filePath, data);
+    return '/uploads/' + filename;
+};
+
+app.get('/admin-books', isAuthenticated, (req, res) => {
+    const data = readJsonFile(booksDataFile, []);
+    const sortedBooks = [...data.books].sort((a, b) => a.order - b.order);
+
+    res.render('admin/books', {
+        activePage: 'books',
+        viewMode: 'list',
+        books: sortedBooks,
+        isEdit: false,
+        book: {},
+        user: req.session.user,
+        success: req.query.success || null,
+        error: req.query.error || null
+    });
+});
+
+app.get('/books/new', isAuthenticated, (req, res) => {
+    res.render('admin/books', {
+        activePage: 'books',
+        viewMode: 'edit',
+        isEdit: false,
+        book: {},
+        user: req.session.user,
+        success: req.query.success || null,
+        error: req.query.error || null
+    });
+});
+
+app.get('/books/edit/:id', isAuthenticated, (req, res) => {
+    const data = readJsonFile(booksDataFile, []);
+    const bookId = parseInt(req.params.id);
+    const book = data.books.find(b => b.id === bookId);
+
+    if (!book) {
+        return res.redirect('/admin-books?error=Book not found');
+    }
+
+    res.render('admin/books', {
+        activePage: 'books',
+        viewMode: 'edit',
+        isEdit: true,
+        book: book,
+        user: req.session.user,
+        success: req.query.success || null,
+        error: req.query.error || null
+    });
+});
+
+app.get('/books', (req, res) => {
+    try {
+        const booksData = readJsonFile(booksDataFile, []);
+        const settings = readJsonFile(settingsDataFile, []);
+        const publishedBooks = (booksData.books || [])
+            .filter(book => book.is_published)
+            .sort((a, b) => a.order - b.order);
+
+        res.render('public/public-books', {
+            books: publishedBooks,
+            settings: settings,
+            layout: false
+        });
+    } catch (error) {
+        console.error('Books page error:', error);
+        res.status(500).send('Error loading books page');
+    }
+});
+
+app.get('/books/:slug', (req, res) => {
+    try {
+        const booksData = readJsonFile(booksDataFile, []);
+        const settings = readJsonFile(settingsDataFile, []);
+        const book = (booksData.books || []).find(b => b.slug === req.params.slug && b.is_published);
+
+        if (!book) {
+            return res.status(404).render('404', { message: 'Book not found' });
+        }
+
+        const formattedBook = {
+            ...book,
+            benefits: book.benefits || [],
+            table_of_contents: book.table_of_contents || []
+        };
+
+        res.render('public/public-book-detail', {
+            book: formattedBook,
+            settings: settings,
+            layout: false
+        });
+    } catch (error) {
+        console.error('Book detail error:', error);
+        res.status(500).send('Error loading book details');
+    }
+});
+
 app.get('/', (req, res) => {
+    try {
+        const homepageData = readJsonFile(homepageDataFile, []);
+        const settings = readJsonFile(settingsDataFile, []);
+        const aboutData = readJsonFile(aboutDataFile, []);
+        const booksData = readJsonFile(booksDataFile, []);
+        const blogData = readJsonFile(blogPostsDataFile, []);
+        const contactData = readJsonFile(contactDataFile, []);
+        const featuredBooks = (booksData.books || [])
+            .filter(book => book.is_published && book.is_featured)
+            .sort((a, b) => a.order - b.order)
+            .slice(0, 3);
+        const displayBooks = featuredBooks.length > 0 ? featuredBooks :
+            (booksData.books || [])
+                .filter(book => book.is_published)
+                .sort((a, b) => a.order - b.order)
+                .slice(0, 3);
+        const recentPosts = (blogData.posts || [])
+            .filter(post => post.is_published)
+            .sort((a, b) => new Date(b.date || b.createdAt) - new Date(a.date || a.createdAt))
+            .slice(0, 3)
+            .map(post => {
+                const date = new Date(post.date || post.createdAt);
+                return {
+                    ...post,
+                    formatted_date: date.toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                        year: 'numeric'
+                    })
+                };
+            });
+
+        res.render('public/public-home', {
+            homepageData: homepageData,
+            settings: settings,
+            aboutData: aboutData,
+            books: displayBooks,
+            posts: recentPosts,
+            contactData: contactData,
+            success: req.query.success || null,
+            error: req.query.error || null,
+            layout: false
+        });
+    } catch (error) {
+        console.error('Home page error:', error);
+        res.status(500).send('Error loading home page');
+    }
+});
+
+app.get('/admin', (req, res) => {
     if (req.session.user) {
         res.redirect('/dashboard');
     } else {
@@ -109,74 +353,86 @@ app.get('/', (req, res) => {
     }
 });
 
-// Login GET
 app.get('/admin/login', (req, res) => {
     if (req.session.user) {
         return res.redirect('/dashboard');
     }
-    res.render('admin-login', {
+    res.render('admin/admin-login', {
         error: null,
         title: 'Admin Login'
     });
 });
 
-// Login POST
-app.post('/admin/login', (req, res) => {
-    const { email, password } = req.body;
-    const user = users.find(u => u.email === email);
-
-    if (!user || password !== user.password) {
-        return res.render('admin-login', {
-            error: 'Invalid email or password',
-            title: 'Admin Login'
-        });
-    }
-
-    req.session.user = {
-        id: user.id,
-        email: user.email
-    };
-
-    req.session.save((err) => {
-        if (err) console.error('Session save error:', err);
-        res.redirect('/dashboard');
+app.get('/subscribers', isAuthenticated, (req, res) => {
+    res.render('admin/subscribers', {
+        activePage: 'subscribers',
+        user: req.session.user
     });
 });
 
-// Logout
+app.get('/images', isAuthenticated, (req, res) => {
+    const images = readJsonFile(imagesDataFile, []);
+    res.render('admin/images', {
+        activePage: 'images',
+        user: req.session.user,
+        images: images,
+        error: req.query.error || null,
+        success: req.query.success || null
+    });
+});
+
 app.get('/admin/logout', (req, res) => {
     req.session.destroy((err) => {
         res.redirect('/admin/login');
     });
 });
 
-// Dashboard
 app.get('/dashboard', isAuthenticated, (req, res) => {
-    res.render('dashboard', { activePage: 'dashboard', user: req.session.user });
+    res.render('admin/dashboard', { activePage: 'dashboard', user: req.session.user });
 });
 
-// Settings
-const settingsDataFile = path.join(__dirname, 'data', 'settings.json');
+app.get('/messages', isAuthenticated, (req, res) => {
+    const messages = readJsonFile(messagesDataFile, []);
+    const unreadCount = messages.filter(m => m.status === 'unread').length;
 
-// Helper functions for settings
-const getSettings = () => {
-    try {
-        return JSON.parse(fs.readFileSync(settingsDataFile, 'utf8'));
-    } catch {
-        return {};
+    res.render('admin/messages', {
+        activePage: 'messages',
+        viewMode: 'list',
+        user: req.session.user,
+        messages: messages,
+        unreadCount: unreadCount,
+        success: req.query.success || null,
+        error: req.query.error || null
+    });
+});
+
+app.get('/messages/:id', isAuthenticated, (req, res) => {
+    const messages = readJsonFile(messagesDataFile, []);
+    const messageId = parseInt(req.params.id);
+    const message = messages.find(m => m.id === messageId);
+
+    if (!message) {
+        return res.redirect('/messages?error=Message not found');
     }
-};
 
-const saveSettings = (settings) => {
-    fs.writeFileSync(settingsDataFile, JSON.stringify(settings, null, 2));
-};
+    if (message.status === 'unread') {
+        message.status = 'read';
+        writeJsonFile(messagesDataFile, messages);
+    }
 
-// ============ SETTINGS ROUTES ============
+    res.render('admin/messages', {
+        activePage: 'messages',
+        viewMode: 'detail',
+        user: req.session.user,
+        message: message,
+        success: req.query.success || null,
+        error: req.query.error || null
+    });
+});
 
-// GET - Display settings page
 app.get('/settings', isAuthenticated, (req, res) => {
-    const settings = getSettings();
-    res.render('site-settings', {
+    const settings = readJsonFile(settingsDataFile, []);
+    res.render('admin/site-settings', {
         activePage: 'settings',
         user: req.session.user,
         settings: settings,
@@ -185,7 +441,361 @@ app.get('/settings', isAuthenticated, (req, res) => {
     });
 });
 
-// POST - Save settings
+app.get('/arcreaders', (req, res) => {
+    const data = readJsonFile(arcReadersDataFile, []);
+    res.render('public/public-arc-readers', {
+        data: data
+    });
+});
+
+app.get('/bonusrecipes', (req, res) => {
+    const data = readJsonFile(bonusRecipesDataFile, []);
+    res.render('public/public-bonus-recipes', {
+        data: data
+    });
+});
+
+app.get('/arc-readers', isAuthenticated, (req, res) => {
+    const data = readJsonFile(arcReadersDataFile, []);
+    res.render('admin/arc-readers', {
+        activePage: 'arc-readers',
+        user: req.session.user,
+        data: data,
+        success: req.query.success || null,
+        error: req.query.error || null
+    });
+});
+
+app.get('/favorites', (req, res) => {
+    try {
+        const favoritesData = readJsonFile(favoritesDataFile, []);
+        const settings = readJsonFile(settingsDataFile, []);
+        const categories = favoritesData.categories || [];
+        const products = favoritesData.products || [];
+        const sortedProducts = [...products].sort((a, b) => a.order - b.order);
+
+        res.render('public/public-favorites', {
+            favoritesText: favoritesData.pageText || {},
+            categories: categories,
+            products: sortedProducts,
+            settings: settings,
+            layout: false
+        });
+    } catch (error) {
+        console.error('Favorites page error:', error);
+        res.status(500).send('Error loading favorites page');
+    }
+});
+
+app.get('/admin-favorites', isAuthenticated, (req, res) => {
+    const data = readJsonFile(favoritesDataFile, []);
+    const sortedProducts = [...data.products].sort((a, b) => a.order - b.order);
+
+    res.render('admin/favorites', {
+        activePage: 'favorites',
+        viewMode: 'list',
+        user: req.session.user,
+        favoritesText: data.pageText,
+        categories: data.categories,
+        products: sortedProducts,
+        success: req.query.success || null,
+        error: req.query.error || null
+    });
+});
+
+app.get('/bonus-recipes', isAuthenticated, (req, res) => {
+    const data = readJsonFile(bonusRecipesDataFile, []);
+    res.render('admin/bonus-recipes', {
+        activePage: 'bonus-recipes',
+        user: req.session.user,
+        data: data,
+        success: req.query.success || null,
+        error: req.query.error || null
+    });
+});
+
+app.get('/favorites/product/new', isAuthenticated, (req, res) => {
+    const data = readJsonFile(favoritesDataFile, []);
+    res.render('admin/favorites-form', {
+        activePage: 'favorites',
+        isEdit: false,
+        product: {},
+        categories: data.categories,
+        user: req.session.user,
+        success: req.query.success || null,
+        error: req.query.error || null
+    });
+});
+
+app.get('/favorites/product/edit/:id', isAuthenticated, (req, res) => {
+    const data = readJsonFile(favoritesDataFile, []);
+    const productId = parseInt(req.params.id);
+    const product = data.products.find(p => p.id === productId);
+
+    if (!product) {
+        return res.redirect('/admin-favorites?error=Product not found');
+    }
+
+    res.render('admin/favorites-form', {
+        activePage: 'favorites',
+        isEdit: true,
+        product: product,
+        categories: data.categories,
+        user: req.session.user,
+        success: req.query.success || null,
+        error: req.query.error || null
+    });
+});
+
+app.get('/contact', (req, res) => {
+    try {
+        const contactData = readJsonFile(contactDataFile, []);
+        const settings = readJsonFile(settingsDataFile, []);
+        const homepageData = readJsonFile(homepageDataFile, []);
+
+        res.render('public/public-contact', {
+            data: contactData,
+            settings: settings,
+            homepageData: homepageData,
+            success: req.query.success || null,
+            error: req.query.error || null,
+            layout: false
+        });
+    } catch (error) {
+        console.error('Contact page error:', error);
+        res.status(500).send('Error loading contact page');
+    }
+});
+
+app.get('/contact-page', isAuthenticated, (req, res) => {
+    const data = readJsonFile(contactDataFile, []);
+    const images = readJsonFile(imagesDataFile, []); // Get images from images.json
+
+    res.render('admin/contact-page', {
+        activePage: 'contact-page',
+        user: req.session.user,
+        data: data,
+        images: images,
+        success: req.query.success || null,
+        error: req.query.error || null
+    });
+});
+
+app.get('/blog-posts', isAuthenticated, (req, res) => {
+    const data = readJsonFile(blogPostsDataFile, []);
+    const sortedPosts = [...data.posts].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+    res.render('admin/blog-posts', {
+        activePage: 'blog-posts',
+        viewMode: 'list',
+        posts: sortedPosts,
+        pageHeading: data.page_heading,
+        user: req.session.user,
+        success: req.query.success || null,
+        error: req.query.error || null
+    });
+});
+
+app.get('/blog', (req, res) => {
+    try {
+        const blogData = readJsonFile(blogPostsDataFile, []);
+        const posts = blogData.posts || [];
+        const settings = readJsonFile(settingsDataFile, []);
+
+        const formattedPosts = posts.map(post => {
+            const date = new Date(post.date || post.createdAt);
+            return {
+                ...post,
+                formatted_date_short: date.toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric'
+                })
+            };
+        });
+
+        const sortedPosts = formattedPosts.sort((a, b) => {
+            return new Date(b.date || b.createdAt) - new Date(a.date || a.createdAt);
+        });
+
+        const categories = [...new Set(posts.map(p => p.category).filter(Boolean))];
+
+        res.render('public/public-blog', {
+            posts: sortedPosts,
+            categories: categories,
+            settings: settings,
+            layout: false
+        });
+    } catch (error) {
+        console.error('Blog page error:', error);
+        res.status(500).send('Error loading blog page');
+    }
+});
+
+app.get('/blog/:slug', (req, res) => {
+    try {
+        const blogData = readJsonFile(blogPostsDataFile, []);
+        const posts = blogData.posts || [];
+        const post = posts.find(p => p.slug === req.params.slug && p.is_published);
+
+        if (!post) {
+            return res.status(404).render('404', { message: 'Blog post not found' });
+        }
+
+        const settings = readJsonFile(settingsDataFile, []);
+
+        const date = new Date(post.date || post.createdAt);
+        post.formatted_date = date.toLocaleDateString('en-US', {
+            month: 'long',
+            day: 'numeric',
+            year: 'numeric'
+        });
+
+        res.render('public/public-blog-post', {
+            post: post,
+            settings: settings,
+            layout: false
+        });
+    } catch (error) {
+        console.error('Blog post error:', error);
+        res.status(500).send('Error loading blog post');
+    }
+});
+
+app.get('/blog-posts/new', isAuthenticated, (req, res) => {
+    const data = readJsonFile(blogPostsDataFile, []);
+    res.render('admin/blog-posts', {
+        activePage: 'blog-posts',
+        viewMode: 'edit',
+        isEdit: false,
+        post: {},
+        categories: getCategories(),
+        pageHeading: data.page_heading,
+        user: req.session.user,
+        success: req.query.success || null,
+        error: req.query.error || null
+    });
+});
+
+app.get('/blog-posts/edit/:id', isAuthenticated, (req, res) => {
+    const data = readJsonFile(blogPostsDataFile, []);
+    const postId = parseInt(req.params.id);
+    const post = data.posts.find(p => p.id === postId);
+
+    if (!post) {
+        return res.redirect('/blog-posts?error=Post not found');
+    }
+
+    res.render('admin/blog-posts', {
+        activePage: 'blog-posts',
+        viewMode: 'edit',
+        isEdit: true,
+        post: post,
+        categories: getCategories(),
+        pageHeading: data.page_heading,
+        user: req.session.user,
+        success: req.query.success || null,
+        error: req.query.error || null
+    });
+});
+
+app.get('/benefits', (req, res) => {
+    try {
+        const benefitsData = readJsonFile(benefitsDataFile, []);
+        const settings = readJsonFile(settingsDataFile, []);
+        const recipesData = readJsonFile(recipesDataFile, []);
+        const allRecipes = recipesData.recipes || [];
+        const associatedRecipeIds = benefitsData.associated_recipes || [];
+        const associatedRecipes = allRecipes.filter(r => associatedRecipeIds.includes(r.id));
+
+        res.render('public/public-benefits', {
+            data: benefitsData,
+            recipes: associatedRecipes,
+            settings: settings,
+            layout: false
+        });
+    } catch (error) {
+        console.error('Benefits page error:', error);
+        res.status(500).send('Error loading benefits page');
+    }
+});
+
+app.get('/homepage', isAuthenticated, (req, res) => {
+    const data = readJsonFile(homepageDataFile, []);
+    res.render('admin/homepage', {
+        activePage: 'homepage',
+        user: req.session.user,
+        data: data,
+        success: req.query.success || null,
+        error: req.query.error || null
+    });
+});
+
+app.get('/terms', (req, res) => {
+    res.render('public/public-terms', {
+        activePage: 'public-terms'
+    });
+});
+
+app.get('/privacy', (req, res) => {
+    res.render('public/public-privacy-policy', {
+        activePage: 'public-privacy-policy'
+    });
+});
+
+app.get('/benefits-page', isAuthenticated, (req, res) => {
+    const data = readJsonFile(benefitsDataFile, []);
+    const recipesData = readJsonFile(recipesDataFile, []);
+
+    res.render('admin/benefits-page', {
+        activePage: 'benefits-page',
+        user: req.session.user,
+        data: data,
+        recipes: recipesData.recipes || [],
+        success: req.query.success || null,
+        error: req.query.error || null
+    });
+});
+
+app.get('/about-page', isAuthenticated, (req, res) => {
+    try {
+        const data = readJsonFile(aboutDataFile, []);
+        res.render('admin/about-page', {
+            activePage: 'about-page',
+            user: req.session.user,
+            data: data,
+            success: req.query.success || null,
+            error: req.query.error || null
+        });
+    } catch (error) {
+        console.error('GET About error:', error);
+        res.render('admin/about-page', {
+            activePage: 'about-page',
+            user: req.session.user,
+            data: { journey_timeline: [], values_pillars: [] },
+            error: 'Failed to load about page data'
+        });
+    }
+});
+
+app.get('/about', (req, res) => {
+    try {
+        const aboutData = readJsonFile(aboutDataFile, []);
+        const settings = readJsonFile(settingsDataFile, []);
+        const homepageData = readJsonFile(homepageDataFile, []);
+
+        res.render('public/public-about', {
+            data: aboutData,
+            settings: settings,
+            homepageData: homepageData,
+            layout: false
+        });
+    } catch (error) {
+        console.error('About page error:', error);
+        res.status(500).send('Error loading about page');
+    }
+});
+
 app.post('/settings/save', isAuthenticated, (req, res) => {
     try {
         const {
@@ -205,7 +815,7 @@ app.post('/settings/save', isAuthenticated, (req, res) => {
         } = req.body;
 
         const settings = {
-            siteTitle: siteTitle || "Nora Hale Books",
+            siteTitle: siteTitle,
             tagline: tagline || "",
             footerText: footerText || "",
             ogTitle: ogTitle || "",
@@ -222,7 +832,7 @@ app.post('/settings/save', isAuthenticated, (req, res) => {
             }
         };
 
-        saveSettings(settings);
+        writeJsonFile(settingsDataFile, settings);
         res.redirect('/settings?success=Settings saved successfully');
     } catch (error) {
         console.error('Save settings error:', error);
@@ -230,7 +840,6 @@ app.post('/settings/save', isAuthenticated, (req, res) => {
     }
 });
 
-// POST - Reset settings to defaults
 app.post('/settings/reset', isAuthenticated, (req, res) => {
     try {
         const defaultSettings = {
@@ -250,7 +859,7 @@ app.post('/settings/reset', isAuthenticated, (req, res) => {
                 contact: "Connect"
             }
         };
-        saveSettings(defaultSettings);
+        writeJsonFile(settingsDataFile, defaultSettings);
         res.redirect('/settings?success=Settings reset to defaults');
     } catch (error) {
         console.error('Reset settings error:', error);
@@ -258,73 +867,42 @@ app.post('/settings/reset', isAuthenticated, (req, res) => {
     }
 });
 
-// Add this after your other data structures and before the messages routes
+app.post('/admin/login', (req, res) => {
+    const { email, password } = req.body;
+    const adminEmail = process.env.ADMIN_EMAIL;
+    const adminPassword = process.env.ADMIN_PASSWORD;
+    const developerEmail = process.env.DEVELOPER_EMAIL;
+    const developerPassword = process.env.DEVELOPER_PASSWORD;
+    let user = null;
 
-// ============ MESSAGES DATA MANAGEMENT ============
-
-const messagesDataFile = path.join(__dirname, 'data', 'messages.json');
-
-// Helper functions for messages
-const getMessages = () => {
-    try {
-        return JSON.parse(fs.readFileSync(messagesDataFile, 'utf8'));
-    } catch {
-        return [];
+    if (email === adminEmail && password === adminPassword) {
+        user = { id: 'admin', email: adminEmail, role: 'admin' };
+    } else if (email === developerEmail && password === developerPassword) {
+        user = { id: 'developer', email: developerEmail, role: 'developer' };
     }
-};
 
-const saveMessages = (messages) => {
-    fs.writeFileSync(messagesDataFile, JSON.stringify(messages, null, 2));
-};
+    if (!user) {
+        return res.render('admin/admin-login', {
+            error: 'Invalid email or password',
+            title: 'Admin Login'
+        });
+    }
 
-// ============ MESSAGES ROUTES ============
+    req.session.user = {
+        id: user.id,
+        email: user.email,
+        role: user.role
+    };
 
-// GET - List all messages
-app.get('/messages', isAuthenticated, (req, res) => {
-    const messages = getMessages();
-    const unreadCount = messages.filter(m => m.status === 'unread').length;
-
-    res.render('messages', {
-        activePage: 'messages',
-        viewMode: 'list',
-        user: req.session.user,
-        messages: messages,
-        unreadCount: unreadCount,
-        success: req.query.success || null,
-        error: req.query.error || null
+    req.session.save((err) => {
+        if (err) console.error('Session save error:', err);
+        res.redirect('/dashboard');
     });
 });
 
-// GET - Single message detail
-app.get('/messages/:id', isAuthenticated, (req, res) => {
-    const messages = getMessages();
-    const messageId = parseInt(req.params.id);
-    const message = messages.find(m => m.id === messageId);
-
-    if (!message) {
-        return res.redirect('/messages?error=Message not found');
-    }
-
-    // Mark as read when viewed
-    if (message.status === 'unread') {
-        message.status = 'read';
-        saveMessages(messages);
-    }
-
-    res.render('messages', {
-        activePage: 'messages',
-        viewMode: 'detail',
-        user: req.session.user,
-        message: message,
-        success: req.query.success || null,
-        error: req.query.error || null
-    });
-});
-
-// POST - Mark message as read/unread
 app.post('/messages/toggle-status/:id', isAuthenticated, (req, res) => {
     try {
-        const messages = getMessages();
+        const messages = readJsonFile(messagesDataFile, []);
         const messageId = parseInt(req.params.id);
         const message = messages.find(m => m.id === messageId);
 
@@ -334,7 +912,7 @@ app.post('/messages/toggle-status/:id', isAuthenticated, (req, res) => {
 
         // Toggle status
         message.status = message.status === 'unread' ? 'read' : 'unread';
-        saveMessages(messages);
+        writeJsonFile(messagesDataFile, messages);
 
         res.redirect('/messages/' + messageId + '?success=Message status updated');
     } catch (error) {
@@ -343,13 +921,12 @@ app.post('/messages/toggle-status/:id', isAuthenticated, (req, res) => {
     }
 });
 
-// POST - Delete message
 app.post('/messages/delete/:id', isAuthenticated, (req, res) => {
     try {
         const messageId = parseInt(req.params.id);
-        let messages = getMessages();
+        let messages = readJsonFile(messagesDataFile, []);
         messages = messages.filter(m => m.id !== messageId);
-        saveMessages(messages);
+        writeJsonFile(messagesDataFile, messages);
 
         res.redirect('/messages?success=Message deleted successfully');
     } catch (error) {
@@ -358,10 +935,9 @@ app.post('/messages/delete/:id', isAuthenticated, (req, res) => {
     }
 });
 
-// POST - Delete all messages (optional)
 app.post('/messages/delete-all', isAuthenticated, (req, res) => {
     try {
-        saveMessages([]);
+        writeJsonFile(messagesDataFile, []);
         res.redirect('/messages?success=All messages deleted');
     } catch (error) {
         console.error('Delete all error:', error);
@@ -369,29 +945,6 @@ app.post('/messages/delete-all', isAuthenticated, (req, res) => {
     }
 });
 
-// Subscribers
-app.get('/subscribers', isAuthenticated, (req, res) => {
-    res.render('subscribers', {
-        activePage: 'subscribers',
-        user: req.session.user
-    });
-});
-
-// ============ IMAGES ROUTES ============
-
-// GET images
-app.get('/images', isAuthenticated, (req, res) => {
-    const images = getImages();
-    res.render('images', {
-        activePage: 'images',
-        user: req.session.user,
-        images: images,
-        error: req.query.error || null,
-        success: req.query.success || null
-    });
-});
-
-// POST upload - FIXED
 app.post('/images/upload', isAuthenticated, (req, res) => {
     upload.single('image')(req, res, function (err) {
         if (err) {
@@ -407,7 +960,7 @@ app.post('/images/upload', isAuthenticated, (req, res) => {
         }
 
         try {
-            const images = getImages();
+            const images = readJsonFile(imagesDataFile, []);
             const newImage = {
                 id: Date.now().toString(),
                 filename: req.file.filename,
@@ -418,7 +971,7 @@ app.post('/images/upload', isAuthenticated, (req, res) => {
             };
 
             images.unshift(newImage);
-            saveImages(images);
+            writeJsonFile(imagesDataFile, images);
 
             req.session.save(() => {
                 res.redirect('/images?success=Image uploaded successfully');
@@ -433,11 +986,10 @@ app.post('/images/upload', isAuthenticated, (req, res) => {
     });
 });
 
-// POST delete - FIXED
 app.post('/images/delete/:id', isAuthenticated, (req, res) => {
     try {
         const imageId = req.params.id;
-        let images = getImages();
+        let images = readJsonFile(imagesDataFile, []);
         const imageToDelete = images.find(img => img.id === imageId);
 
         if (!imageToDelete) {
@@ -450,7 +1002,7 @@ app.post('/images/delete/:id', isAuthenticated, (req, res) => {
         }
 
         images = images.filter(img => img.id !== imageId);
-        saveImages(images);
+        writeJsonFile(imagesDataFile, images);
 
         req.session.save(() => {
             res.redirect('/images?success=Image deleted successfully');
@@ -461,105 +1013,103 @@ app.post('/images/delete/:id', isAuthenticated, (req, res) => {
     }
 });
 
-// Helper functions for Books
-const getBooksData = () => {
+app.post('/newsletter/subscribe', (req, res) => {
     try {
-        return JSON.parse(fs.readFileSync(booksDataFile, 'utf8'));
-    } catch {
-        return { books: [] };
+        const { name, email } = req.body;
+
+        // Here you would integrate with your email marketing service (Kit, Mailchimp, etc.)
+        // For now, we'll just log it
+
+        // You would typically send this to your email service provider's API
+        // Example with Kit (formerly ConvertKit):
+        // const response = await fetch('https://api.kit.com/v3/forms/YOUR_FORM_ID/subscribe', {
+        //     method: 'POST',
+        //     headers: {
+        //         'Content-Type': 'application/json',
+        //         'Authorization': 'Bearer YOUR_API_KEY'
+        //     },
+        //     body: JSON.stringify({
+        //         email: email,
+        //         first_name: name
+        //     })
+        // });
+
+        res.redirect('/books?success=Thank you for subscribing!');
+    } catch (error) {
+        console.error('Newsletter subscription error:', error);
+        res.redirect('/books?error=Failed to subscribe. Please try again.');
     }
-};
-
-const saveBooksData = (data) => {
-    fs.writeFileSync(booksDataFile, JSON.stringify(data, null, 2));
-};
-
-// ============ BOOKS ROUTES ============
-const booksDataFile = path.join(__dirname, 'data', 'books.json');
-// GET - List all books
-app.get('/books', isAuthenticated, (req, res) => {
-    const data = getBooksData();
-    const sortedBooks = [...data.books].sort((a, b) => a.order - b.order);
-
-    res.render('books', {
-        activePage: 'books',
-        viewMode: 'list',
-        books: sortedBooks,
-        isEdit: false, // <-- Added to prevent ReferenceError
-        book: {},      // <-- Added to prevent ReferenceError
-        user: req.session.user,
-        success: req.query.success || null,
-        error: req.query.error || null
-    });
 });
 
-// GET - New book form
-app.get('/books/new', isAuthenticated, (req, res) => {
-    res.render('books', {
-        activePage: 'books',
-        viewMode: 'edit',
-        isEdit: false,
-        book: {},
-        user: req.session.user,
-        success: req.query.success || null,
-        error: req.query.error || null
-    });
-});
-
-// GET - Edit book form
-app.get('/books/edit/:id', isAuthenticated, (req, res) => {
-    const data = getBooksData();
-    const bookId = parseInt(req.params.id);
-    const book = data.books.find(b => b.id === bookId);
-
-    if (!book) {
-        return res.redirect('/books?error=Book not found');
-    }
-
-    res.render('books', {
-        activePage: 'books',
-        viewMode: 'edit',
-        isEdit: true,
-        book: book,
-        user: req.session.user,
-        success: req.query.success || null,
-        error: req.query.error || null
-    });
-});
-
-// POST - Save book (create or update)
-app.post('/books/save', isAuthenticated, (req, res) => {
+app.post('/books/save', isAuthenticated, upload.single('cover_image_file'), (req, res) => {
     try {
         const {
-            id, title, subtitle, slug, cover_image, description,
+            id, title, subtitle, slug, description,
             medical_note, buy_buttons, benefits, table_of_contents,
-            is_published
+            is_published, cover_image
         } = req.body;
 
-        const data = getBooksData();
+        const data = readJsonFile(booksDataFile, []);
+        const bookId = id ? parseInt(id) : null;
+        const oldBook = bookId ? data.books.find(b => b.id === bookId) : null;
 
-        // Parse JSON fields
         let parsedBuyButtons = [];
         let parsedBenefits = [];
         let parsedTableOfContents = [];
 
-        try {
-            parsedBuyButtons = buy_buttons ? JSON.parse(buy_buttons) : [];
-        } catch { parsedBuyButtons = []; }
+        try { parsedBuyButtons = buy_buttons ? JSON.parse(buy_buttons) : []; } catch { parsedBuyButtons = []; }
+        try { parsedBenefits = benefits ? JSON.parse(benefits) : []; } catch { parsedBenefits = []; }
+        try { parsedTableOfContents = table_of_contents ? JSON.parse(table_of_contents) : []; } catch { parsedTableOfContents = []; }
 
-        try {
-            parsedBenefits = benefits ? JSON.parse(benefits) : [];
-        } catch { parsedBenefits = []; }
+        const oldCover = oldBook?.cover_image || '';
+        const oldWasLocal = oldCover.startsWith('/uploads/');
 
-        try {
-            parsedTableOfContents = table_of_contents ? JSON.parse(table_of_contents) : [];
-        } catch { parsedTableOfContents = []; }
+        let finalCoverImage = oldCover;
+
+        if (req.file) {
+            finalCoverImage = `/uploads/${req.file.filename}`;
+
+            if (oldWasLocal) {
+                const oldFileName = path.basename(oldCover);
+                const oldFilePath = path.join(uploadDir, oldFileName);
+
+                if (fs.existsSync(oldFilePath)) {
+                    try {
+                        fs.unlinkSync(oldFilePath);
+                    } catch (err) {
+                        console.error('Failed to delete old cover image:', err);
+                    }
+                }
+            }
+        } else if (cover_image !== undefined) {
+            const newCover = cover_image.trim();
+            const newIsRemoteUrl = /^https?:\/\//i.test(newCover);
+
+            if (newIsRemoteUrl) {
+                finalCoverImage = newCover;
+
+                if (oldWasLocal && oldCover !== newCover) {
+                    const oldFileName = path.basename(oldCover);
+                    const oldFilePath = path.join(uploadDir, oldFileName);
+
+                    if (fs.existsSync(oldFilePath)) {
+                        try {
+                            fs.unlinkSync(oldFilePath);
+                        } catch (err) {
+                            console.error('Failed to delete old cover image:', err);
+                        }
+                    }
+                }
+            } else if (newCover) {
+                finalCoverImage = newCover;
+            }
+        }
 
         const bookData = {
             title: title || "Untitled Book",
             subtitle: subtitle || "",
             slug: slug ? slug.trim().toLowerCase().replace(/[^a-z0-9-_]/g, '-') : "",
-            cover_image: cover_image || "",
+            cover_image: finalCoverImage,
             description: description || "",
             medical_note: medical_note || "",
             buy_buttons: parsedBuyButtons,
@@ -569,14 +1119,11 @@ app.post('/books/save', isAuthenticated, (req, res) => {
         };
 
         if (id) {
-            // Update existing book
-            const bookId = parseInt(id);
             const index = data.books.findIndex(b => b.id === bookId);
             if (index !== -1) {
                 data.books[index] = { ...data.books[index], ...bookData };
             }
         } else {
-            // Create new book
             const newId = data.books.length > 0 ? Math.max(...data.books.map(b => b.id)) + 1 : 1;
             const newOrder = data.books.length > 0 ? Math.max(...data.books.map(b => b.order)) + 1 : 1;
 
@@ -588,33 +1135,31 @@ app.post('/books/save', isAuthenticated, (req, res) => {
             });
         }
 
-        saveBooksData(data);
-        res.redirect('/books?success=Book saved successfully');
+        writeJsonFile(booksDataFile, data);
+        res.redirect('/admin-books?success=Book saved successfully');
     } catch (error) {
         console.error('Save book error:', error);
-        res.redirect('/books?error=Failed to save book');
+        res.redirect('/admin-books?error=Failed to save book');
     }
 });
 
-// POST - Delete book
 app.post('/books/delete/:id', isAuthenticated, (req, res) => {
     try {
         const bookId = parseInt(req.params.id);
-        const data = getBooksData();
+        const data = readJsonFile(booksDataFile, []);
         data.books = data.books.filter(b => b.id !== bookId);
-        saveBooksData(data);
-        res.redirect('/books?success=Book deleted successfully');
+        writeJsonFile(booksDataFile, data);
+        res.redirect('/admin-books?success=Book deleted successfully');
     } catch (error) {
         console.error('Delete book error:', error);
-        res.redirect('/books?error=Failed to delete book');
+        res.redirect('/admin-books?error=Failed to delete book');
     }
 });
 
-// POST - Move book up
 app.post('/books/move-up/:id', isAuthenticated, (req, res) => {
     try {
         const bookId = parseInt(req.params.id);
-        const data = getBooksData();
+        const data = readJsonFile(booksDataFile, []);
         const sorted = [...data.books].sort((a, b) => a.order - b.order);
         const index = sorted.findIndex(b => b.id === bookId);
 
@@ -622,21 +1167,20 @@ app.post('/books/move-up/:id', isAuthenticated, (req, res) => {
             const tempOrder = sorted[index].order;
             sorted[index].order = sorted[index - 1].order;
             sorted[index - 1].order = tempOrder;
-            saveBooksData(data);
+            writeJsonFile(booksDataFile, data);
         }
 
-        res.redirect('/books?success=Book moved up');
+        res.redirect('/admin-books?success=Book moved up');
     } catch (error) {
         console.error('Move up error:', error);
-        res.redirect('/books?error=Failed to move book');
+        res.redirect('/admin-books?error=Failed to move book');
     }
 });
 
-// POST - Move book down
 app.post('/books/move-down/:id', isAuthenticated, (req, res) => {
     try {
         const bookId = parseInt(req.params.id);
-        const data = getBooksData();
+        const data = readJsonFile(booksDataFile, []);
         const sorted = [...data.books].sort((a, b) => a.order - b.order);
         const index = sorted.findIndex(b => b.id === bookId);
 
@@ -644,77 +1188,46 @@ app.post('/books/move-down/:id', isAuthenticated, (req, res) => {
             const tempOrder = sorted[index].order;
             sorted[index].order = sorted[index + 1].order;
             sorted[index + 1].order = tempOrder;
-            saveBooksData(data);
+            writeJsonFile(booksDataFile, data);
         }
 
-        res.redirect('/books?success=Book moved down');
+        res.redirect('/admin-books?success=Book moved down');
     } catch (error) {
         console.error('Move down error:', error);
-        res.redirect('/books?error=Failed to move book');
+        res.redirect('/admin-books?error=Failed to move book');
     }
 });
 
-// POST - Toggle book visibility
 app.post('/books/toggle-visibility/:id', isAuthenticated, (req, res) => {
     try {
         const bookId = parseInt(req.params.id);
-        const data = getBooksData();
+        const data = readJsonFile(booksDataFile, []);
         const book = data.books.find(b => b.id === bookId);
 
         if (book) {
             book.is_published = !book.is_published;
-            saveBooksData(data);
-            res.redirect('/books?success=Book visibility updated');
+            writeJsonFile(booksDataFile, booksDataFile, data);
+            res.redirect('/admin-books?success=Book visibility updated');
         } else {
-            res.redirect('/books?error=Book not found');
+            res.redirect('/admin-books?error=Book not found');
         }
     } catch (error) {
         console.error('Toggle visibility error:', error);
-        res.redirect('/books?error=Failed to update visibility');
+        res.redirect('/admin-books?error=Failed to update visibility');
     }
 });
 
-// ARC Readers
-const arcReadersDataFile = path.join(__dirname, 'data', 'arc-readers.json');
-// Helper functions for ARC Readers
-const getArcData = () => {
-    try {
-        return JSON.parse(fs.readFileSync(arcReadersDataFile, 'utf8'));
-    } catch {
-        return {};
-    }
-};
-
-const saveArcData = (data) => {
-    fs.writeFileSync(arcReadersDataFile, JSON.stringify(data, null, 2));
-};
-
-// ============ ARC READERS ROUTES ============
-
-// GET - Display ARC Readers page
-app.get('/arc-readers', isAuthenticated, (req, res) => {
-    const data = getArcData();
-    res.render('arc-readers', {
-        activePage: 'arc-readers',
-        user: req.session.user,
-        data: data,
-        success: req.query.success || null,
-        error: req.query.error || null
-    });
-});
-
-// POST - Save ARC Readers content
 app.post('/arc-readers/save', isAuthenticated, (req, res) => {
     try {
         const { title, message, howItWorks } = req.body;
 
         const data = {
-            title: title || "<h1>Be the first to read Nora's new book</h1>",
+            title: title,
             message: message || "",
             howItWorks: howItWorks || ""
         };
 
-        saveArcData(data);
+        writeJsonFile(arcReadersDataFile, data);
         res.redirect('/arc-readers?success=ARC Readers page saved successfully');
     } catch (error) {
         console.error('Save ARC error:', error);
@@ -722,42 +1235,16 @@ app.post('/arc-readers/save', isAuthenticated, (req, res) => {
     }
 });
 
-// Bonus Recipes
-const bonusRecipesDataFile = path.join(__dirname, 'data', 'bonus-recipes.json');
-const getBonusData = () => {
-    try {
-        return JSON.parse(fs.readFileSync(bonusRecipesDataFile, 'utf8'));
-    } catch {
-        return {};
-    }
-};
-
-const saveBonusData = (data) => {
-    fs.writeFileSync(bonusRecipesDataFile, JSON.stringify(data, null, 2));
-};
-// GET - Display Bonus Recipes page
-app.get('/bonus-recipes', isAuthenticated, (req, res) => {
-    const data = getBonusData();
-    res.render('bonus-recipes', {
-        activePage: 'bonus-recipes',
-        user: req.session.user,
-        data: data,
-        success: req.query.success || null,
-        error: req.query.error || null
-    });
-});
-
-// POST - Save Bonus Recipes content
 app.post('/bonus-recipes/save', isAuthenticated, (req, res) => {
     try {
         const { title, message } = req.body;
 
         const data = {
-            title: title || "<h1>Your Bonus Recipes Collection</h1>",
+            title: title,
             message: message || ""
         };
 
-        saveBonusData(data);
+        writeJsonFile(bonusRecipesDataFile, data);
         res.redirect('/bonus-recipes?success=Bonus Recipes page saved successfully');
     } catch (error) {
         console.error('Save Bonus error:', error);
@@ -765,157 +1252,83 @@ app.post('/bonus-recipes/save', isAuthenticated, (req, res) => {
     }
 });
 
-// Favorites
-const favoritesDataFile = path.join(__dirname, 'data', 'favorites.json');
-const getFavoritesData = () => {
-    try {
-        return JSON.parse(fs.readFileSync(favoritesDataFile, 'utf8'));
-    } catch {
-        return { pageText: {}, categories: [], products: [] };
-    }
-};
-
-const saveFavoritesData = (data) => {
-    fs.writeFileSync(favoritesDataFile, JSON.stringify(data, null, 2));
-};
-
-// ============ FAVORITES ROUTES ============
-
-// GET - Main Favorites page
-app.get('/favorites', isAuthenticated, (req, res) => {
-    const data = getFavoritesData();
-    const sortedProducts = [...data.products].sort((a, b) => a.order - b.order);
-
-    res.render('favorites', {
-        activePage: 'favorites',
-        viewMode: 'list',
-        user: req.session.user,
-        favoritesText: data.pageText,
-        categories: data.categories,
-        products: sortedProducts,
-        success: req.query.success || null,
-        error: req.query.error || null
-    });
-});
-
-// POST - Save page text
 app.post('/favorites/save-text', isAuthenticated, (req, res) => {
     try {
         const { page_title, intro_paragraph, affiliate_disclosure } = req.body;
-        const data = getFavoritesData();
+        const data = readJsonFile(favoritesDataFile, []);
 
         data.pageText = {
-            page_title: page_title || "Nora's Favorites",
+            page_title: page_title,
             intro_paragraph: intro_paragraph || "",
             affiliate_disclosure: affiliate_disclosure || ""
         };
 
-        saveFavoritesData(data);
-        res.redirect('/favorites?success=Page text saved successfully');
+        writeJsonFile(favoritesDataFile, data);
+        res.redirect('/admin-favorites?success=Page text saved successfully');
     } catch (error) {
         console.error('Save text error:', error);
-        res.redirect('/favorites?error=Failed to save page text');
+        res.redirect('/admin-favorites?error=Failed to save page text');
     }
 });
 
-// POST - Add category
 app.post('/favorites/category/add', isAuthenticated, (req, res) => {
     try {
         const newCat = req.body.category_name ? req.body.category_name.trim() : "";
         if (newCat) {
-            const data = getFavoritesData();
+            const data = readJsonFile(favoritesDataFile, []);
             if (!data.categories.includes(newCat)) {
                 data.categories.push(newCat);
-                saveFavoritesData(data);
-                res.redirect('/favorites?success=Category added successfully');
+                writeJsonFile(favoritesDataFile, data);
+                res.redirect('/admin-favorites?success=Category added successfully');
             } else {
-                res.redirect('/favorites?error=Category already exists');
+                res.redirect('/admin-favorites?error=Category already exists');
             }
         } else {
-            res.redirect('/favorites?error=Category name is required');
+            res.redirect('/admin-favorites?error=Category name is required');
         }
     } catch (error) {
         console.error('Add category error:', error);
-        res.redirect('/favorites?error=Failed to add category');
+        res.redirect('/admin-favorites?error=Failed to add category');
     }
 });
 
-// POST - Delete category
 app.post('/favorites/category/delete/:name', isAuthenticated, (req, res) => {
     try {
         const catName = req.params.name;
-        const data = getFavoritesData();
+        const data = readJsonFile(favoritesDataFile, []);
         data.categories = data.categories.filter(c => c !== catName);
-        saveFavoritesData(data);
-        res.redirect('/favorites?success=Category deleted successfully');
+        writeJsonFile(favoritesDataFile, data);
+        res.redirect('/admin-favorites?success=Category deleted successfully');
     } catch (error) {
         console.error('Delete category error:', error);
-        res.redirect('/favorites?error=Failed to delete category');
+        res.redirect('/admin-favorites?error=Failed to delete category');
     }
 });
 
-// GET - New product form
-app.get('/favorites/product/new', isAuthenticated, (req, res) => {
-    const data = getFavoritesData();
-    res.render('favorites-form', {
-        activePage: 'favorites',
-        isEdit: false,
-        product: {},
-        categories: data.categories,
-        user: req.session.user,
-        success: req.query.success || null,
-        error: req.query.error || null
-    });
-});
-
-// GET - Edit product form
-app.get('/favorites/product/edit/:id', isAuthenticated, (req, res) => {
-    const data = getFavoritesData();
-    const productId = parseInt(req.params.id);
-    const product = data.products.find(p => p.id === productId);
-
-    if (!product) {
-        return res.redirect('/favorites?error=Product not found');
-    }
-
-    res.render('favorites-form', {
-        activePage: 'favorites',
-        isEdit: true,
-        product: product,
-        categories: data.categories,
-        user: req.session.user,
-        success: req.query.success || null,
-        error: req.query.error || null
-    });
-});
-
-// POST - Save product (create or update)
 app.post('/favorites/product/save', isAuthenticated, (req, res) => {
     try {
         const { id, title, image_url, category, endorsement, description, buy_url, button_label, is_featured, is_published } = req.body;
 
-        const data = getFavoritesData();
+        const data = readJsonFile(favoritesDataFile, []);
         const productData = {
-            title: title || "Untitled Product",
-            image_url: image_url || "https://images.unsplash.com/photo-1543002588-bfa74002ed7e?auto=format&fit=crop&q=80&w=300",
-            category: category || data.categories[0] || "",
+            title: title,
+            image_url: image_url,
+            category: category,
             endorsement: endorsement || "",
             description: description || "",
             buy_url: buy_url || "",
-            button_label: button_label || "View on Amazon",
+            button_label: button_label,
             is_featured: is_featured === 'on',
             is_published: is_published === 'on'
         };
 
         if (id) {
-            // Update existing product
             const productId = parseInt(id);
             const index = data.products.findIndex(p => p.id === productId);
             if (index !== -1) {
                 data.products[index] = { ...data.products[index], ...productData };
             }
         } else {
-            // Create new product
             const newId = data.products.length > 0 ? Math.max(...data.products.map(p => p.id)) + 1 : 1;
             const newOrder = data.products.length > 0 ? Math.max(...data.products.map(p => p.order)) + 1 : 1;
 
@@ -926,33 +1339,31 @@ app.post('/favorites/product/save', isAuthenticated, (req, res) => {
             });
         }
 
-        saveFavoritesData(data);
-        res.redirect('/favorites?success=Product saved successfully');
+        writeJsonFile(favoritesDataFile, data);
+        res.redirect('/admin-favorites?success=Product saved successfully');
     } catch (error) {
         console.error('Save product error:', error);
-        res.redirect('/favorites?error=Failed to save product');
+        res.redirect('/admin-favorites?error=Failed to save product');
     }
 });
 
-// POST - Delete product
 app.post('/favorites/product/delete/:id', isAuthenticated, (req, res) => {
     try {
         const productId = parseInt(req.params.id);
-        const data = getFavoritesData();
+        const data = readJsonFile(favoritesDataFile, []);
         data.products = data.products.filter(p => p.id !== productId);
-        saveFavoritesData(data);
-        res.redirect('/favorites?success=Product deleted successfully');
+        writeJsonFile(favoritesDataFile, data);
+        res.redirect('/admin-favorites?success=Product deleted successfully');
     } catch (error) {
         console.error('Delete product error:', error);
-        res.redirect('/favorites?error=Failed to delete product');
+        res.redirect('/admin-favorites?error=Failed to delete product');
     }
 });
 
-// POST - Move product up
 app.post('/favorites/product/move-up/:id', isAuthenticated, (req, res) => {
     try {
         const productId = parseInt(req.params.id);
-        const data = getFavoritesData();
+        const data = readJsonFile(favoritesDataFile, []);
         const sorted = [...data.products].sort((a, b) => a.order - b.order);
         const index = sorted.findIndex(p => p.id === productId);
 
@@ -960,21 +1371,20 @@ app.post('/favorites/product/move-up/:id', isAuthenticated, (req, res) => {
             const tempOrder = sorted[index].order;
             sorted[index].order = sorted[index - 1].order;
             sorted[index - 1].order = tempOrder;
-            saveFavoritesData(data);
+            writeJsonFile(favoritesDataFile, data);
         }
 
-        res.redirect('/favorites?success=Product moved up');
+        res.redirect('/admin-favorites?success=Product moved up');
     } catch (error) {
         console.error('Move up error:', error);
-        res.redirect('/favorites?error=Failed to move product');
+        res.redirect('/admin-favorites?error=Failed to move product');
     }
 });
 
-// POST - Move product down
 app.post('/favorites/product/move-down/:id', isAuthenticated, (req, res) => {
     try {
         const productId = parseInt(req.params.id);
-        const data = getFavoritesData();
+        const data = readJsonFile(favoritesDataFile, []);
         const sorted = [...data.products].sort((a, b) => a.order - b.order);
         const index = sorted.findIndex(p => p.id === productId);
 
@@ -982,80 +1392,68 @@ app.post('/favorites/product/move-down/:id', isAuthenticated, (req, res) => {
             const tempOrder = sorted[index].order;
             sorted[index].order = sorted[index + 1].order;
             sorted[index + 1].order = tempOrder;
-            saveFavoritesData(data);
+            writeJsonFile(favoritesDataFile, data);
         }
 
-        res.redirect('/favorites?success=Product moved down');
+        res.redirect('/admin-favorites?success=Product moved down');
     } catch (error) {
         console.error('Move down error:', error);
-        res.redirect('/favorites?error=Failed to move product');
+        res.redirect('/admin-favorites?error=Failed to move product');
     }
 });
 
-// Contact Page
-const contactDataFile = path.join(__dirname, 'data', 'contact.json');
-const getContactData = () => {
+app.post('/contact/submit', (req, res) => {
     try {
-        return JSON.parse(fs.readFileSync(contactDataFile, 'utf8'));
-    } catch {
-        return { faqs: [] };
+        const { name, email, message } = req.body;
+
+        const messages = readJsonFile(messagesDataFile, []);
+        const newMessage = {
+            id: messages.length > 0 ? Math.max(...messages.map(m => m.id)) + 1 : 1,
+            name: name,
+            email: email,
+            subject: "Contact Form Submission",
+            message: message,
+            status: "unread",
+            createdAt: new Date().toISOString()
+        };
+        messages.push(newMessage);
+        writeJsonFile(messagesDataFile, messages);
+
+        res.redirect('/contact?success=Your message has been sent! I will get back to you soon.');
+    } catch (error) {
+        console.error('Contact form error:', error);
+        res.redirect('/contact?error=Failed to send message. Please try again.');
     }
-};
-
-const saveContactData = (data) => {
-    fs.writeFileSync(contactDataFile, JSON.stringify(data, null, 2));
-};
-
-// ============ CONTACT PAGE ROUTES ============
-
-// GET - Contact page
-app.get('/contact-page', isAuthenticated, (req, res) => {
-    const data = getContactData();
-    const images = getImages(); // Get images from images.json
-
-    res.render('contact-page', {
-        activePage: 'contact-page',
-        user: req.session.user,
-        data: data,
-        images: images,
-        success: req.query.success || null,
-        error: req.query.error || null
-    });
 });
 
-// POST - Save Contact page
 app.post('/contact-page/save', isAuthenticated, (req, res) => {
     try {
         const { page_title, intro_paragraph, lets_connect_note, photo_strip, faq } = req.body;
 
-        // Process FAQs
         let formattedFaqs = [];
         if (faq && typeof faq === 'object') {
             formattedFaqs = Object.values(faq)
-                .filter(item => item.question || item.answer)
-                .map((item, index) => ({
-                    id: Date.now() + index,
-                    question: item.question || "",
-                    answer: item.answer || ""
+                .filter(item => (item.question || '').trim() || (item.answer || '').trim())
+                .map(item => ({
+                    id: item.id || `faq-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+                    question: item.question || '',
+                    answer: item.answer || ''
                 }));
         }
 
-        // Process photo strip (selected image paths)
-        let photoStrip = [];
-        if (photo_strip) {
-            photoStrip = Array.isArray(photo_strip) ? photo_strip : [photo_strip];
-            photoStrip = photoStrip.filter(url => url && url.trim() !== '');
-        }
+        const photoStrip = photo_strip
+            ? (Array.isArray(photo_strip) ? photo_strip : [photo_strip]).filter(url => url && url.trim() !== '')
+            : [];
 
         const data = {
-            page_title: page_title || "Contact Nora",
-            intro_paragraph: intro_paragraph || "",
-            lets_connect_note: lets_connect_note || "",
+            page_title: page_title,
+            intro_paragraph: intro_paragraph || '',
+            lets_connect_note: lets_connect_note || '',
             photo_strip: photoStrip,
             faqs: formattedFaqs
         };
 
-        saveContactData(data);
+        writeJsonFile(contactDataFile, data);
         res.redirect('/contact-page?success=Contact page saved successfully');
     } catch (error) {
         console.error('Save contact error:', error);
@@ -1063,18 +1461,17 @@ app.post('/contact-page/save', isAuthenticated, (req, res) => {
     }
 });
 
-// POST - Move FAQ up
 app.post('/contact-page/faq/move-up/:id', isAuthenticated, (req, res) => {
     try {
         const faqId = parseInt(req.params.id);
-        const data = getContactData();
+        const data = readJsonFile(contactDataFile, []);
         const index = data.faqs.findIndex(f => f.id === faqId);
 
         if (index > 0) {
             const temp = data.faqs[index];
             data.faqs[index] = data.faqs[index - 1];
             data.faqs[index - 1] = temp;
-            saveContactData(data);
+            writeJsonFile(contactDataFile, data);
         }
 
         res.redirect('/contact-page?success=FAQ moved up');
@@ -1084,18 +1481,17 @@ app.post('/contact-page/faq/move-up/:id', isAuthenticated, (req, res) => {
     }
 });
 
-// POST - Move FAQ down
 app.post('/contact-page/faq/move-down/:id', isAuthenticated, (req, res) => {
     try {
         const faqId = parseInt(req.params.id);
-        const data = getContactData();
+        const data = readJsonFile(contactDataFile, []);
         const index = data.faqs.findIndex(f => f.id === faqId);
 
         if (index !== -1 && index < data.faqs.length - 1) {
             const temp = data.faqs[index];
             data.faqs[index] = data.faqs[index + 1];
             data.faqs[index + 1] = temp;
-            saveContactData(data);
+            writeJsonFile(contactDataFile, data);
         }
 
         res.redirect('/contact-page?success=FAQ moved down');
@@ -1105,13 +1501,12 @@ app.post('/contact-page/faq/move-down/:id', isAuthenticated, (req, res) => {
     }
 });
 
-// POST - Delete FAQ
 app.post('/contact-page/faq/delete/:id', isAuthenticated, (req, res) => {
     try {
         const faqId = parseInt(req.params.id);
-        const data = getContactData();
+        const data = readJsonFile(contactDataFile, []);
         data.faqs = data.faqs.filter(f => f.id !== faqId);
-        saveContactData(data);
+        writeJsonFile(contactDataFile, data);
         res.redirect('/contact-page?success=FAQ deleted');
     } catch (error) {
         console.error('Delete FAQ error:', error);
@@ -1119,125 +1514,32 @@ app.post('/contact-page/faq/delete/:id', isAuthenticated, (req, res) => {
     }
 });
 
-// Blog Posts
-let blogPosts = [
-    {
-        id: 1,
-        title: "How to safely store your organic castor oil packs",
-        slug: "storing-castor-oil-packs",
-        description: "Proper storage is essential...",
-        is_published: true
-    }
-];
-
-const getBlogData = () => {
-    try {
-        return JSON.parse(fs.readFileSync(blogPostsDataFile, 'utf8'));
-    } catch {
-        return { page_heading: "Latest Articles", posts: [] };
-    }
-};
-
-const saveBlogData = (data) => {
-    fs.writeFileSync(blogPostsDataFile, JSON.stringify(data, null, 2));
-};
-
-// ============ BLOG POSTS ROUTES ============
-
-// GET - List all blog posts
-app.get('/blog-posts', isAuthenticated, (req, res) => {
-    const data = getBlogData();
-    const sortedPosts = [...data.posts].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-
-    res.render('blog-posts', {
-        activePage: 'blog-posts',
-        viewMode: 'list',
-        posts: sortedPosts,
-        pageHeading: data.page_heading,
-        user: req.session.user,
-        success: req.query.success || null,
-        error: req.query.error || null
-    });
-});
-
-// GET - New post form
-app.get('/blog-posts/new', isAuthenticated, (req, res) => {
-    const data = getBlogData();
-    res.render('blog-posts', {
-        activePage: 'blog-posts',
-        viewMode: 'edit',
-        isEdit: false,
-        post: {},
-        categories: getCategories(),
-        pageHeading: data.page_heading,
-        user: req.session.user,
-        success: req.query.success || null,
-        error: req.query.error || null
-    });
-});
-
-// GET - Edit post form
-app.get('/blog-posts/edit/:id', isAuthenticated, (req, res) => {
-    const data = getBlogData();
-    const postId = parseInt(req.params.id);
-    const post = data.posts.find(p => p.id === postId);
-
-    if (!post) {
-        return res.redirect('/blog-posts?error=Post not found');
-    }
-
-    res.render('blog-posts', {
-        activePage: 'blog-posts',
-        viewMode: 'edit',
-        isEdit: true,
-        post: post,
-        categories: getCategories(),
-        pageHeading: data.page_heading,
-        user: req.session.user,
-        success: req.query.success || null,
-        error: req.query.error || null
-    });
-});
-
-// Helper to get unique categories from posts
-const getCategories = () => {
-    const data = getBlogData();
-    const categories = data.posts.map(p => p.category).filter(Boolean);
-    return [...new Set(categories)];
-};
-
-// POST - Save blog post (create or update)
-const blogPostsDataFile = path.join(__dirname, 'data', 'blog-posts.json');
 app.post('/blog-posts/save', isAuthenticated, (req, res) => {
     try {
         const { id, title, slug, category, excerpt, description, read_time, date, is_published, page_heading } = req.body;
-        const data = getBlogData();
+        const data = readJsonFile(blogPostsDataFile, []);
 
-        // Update page heading if provided
         if (page_heading !== undefined) {
             data.page_heading = page_heading || "Latest Articles";
         }
 
         const postPayload = {
-            title: title || "Untitled Post",
+            title: title,
             slug: slug ? slug.trim().toLowerCase().replace(/[^a-z0-9-_]/g, '-') : "",
-            category: category || "Uncategorized",
+            category: category,
             excerpt: excerpt || "",
             description: description || "",
-            read_time: read_time || "5 min read",
+            read_time: read_time || "5 min",
             date: date || new Date().toISOString().split('T')[0],
             is_published: is_published === 'on'
         };
-
         if (id) {
-            // Update existing post
             const postId = parseInt(id);
             const index = data.posts.findIndex(p => p.id === postId);
             if (index !== -1) {
                 data.posts[index] = { ...data.posts[index], ...postPayload };
             }
         } else {
-            // Create new post
             const newId = data.posts.length > 0 ? Math.max(...data.posts.map(p => p.id)) + 1 : 1;
             data.posts.push({
                 id: newId,
@@ -1245,8 +1547,7 @@ app.post('/blog-posts/save', isAuthenticated, (req, res) => {
                 createdAt: new Date().toISOString()
             });
         }
-
-        saveBlogData(data);
+        writeJsonFile(blogPostsDataFile, data);
         res.redirect('/blog-posts?success=Post saved successfully');
     } catch (error) {
         console.error('Save post error:', error);
@@ -1254,16 +1555,15 @@ app.post('/blog-posts/save', isAuthenticated, (req, res) => {
     }
 });
 
-// POST - Toggle post visibility
 app.post('/blog-posts/toggle-visibility/:id', isAuthenticated, (req, res) => {
     try {
         const postId = parseInt(req.params.id);
-        const data = getBlogData();
+        const data = readJsonFile(blogPostsDataFile, []);
         const post = data.posts.find(p => p.id === postId);
 
         if (post) {
             post.is_published = !post.is_published;
-            saveBlogData(data);
+            writeJsonFile(blogPostsDataFile, data);
             res.redirect('/blog-posts?success=Post visibility updated');
         } else {
             res.redirect('/blog-posts?error=Post not found');
@@ -1274,13 +1574,12 @@ app.post('/blog-posts/toggle-visibility/:id', isAuthenticated, (req, res) => {
     }
 });
 
-// POST - Delete post
 app.post('/blog-posts/delete/:id', isAuthenticated, (req, res) => {
     try {
         const postId = parseInt(req.params.id);
-        const data = getBlogData();
+        const data = readJsonFile(blogPostsDataFile, []);
         data.posts = data.posts.filter(p => p.id !== postId);
-        saveBlogData(data);
+        writeJsonFile(blogPostsDataFile, data);
         res.redirect('/blog-posts?success=Post deleted successfully');
     } catch (error) {
         console.error('Delete post error:', error);
@@ -1288,13 +1587,12 @@ app.post('/blog-posts/delete/:id', isAuthenticated, (req, res) => {
     }
 });
 
-// POST - Update page heading only
 app.post('/blog-posts/update-heading', isAuthenticated, (req, res) => {
     try {
         const { page_heading } = req.body;
-        const data = getBlogData();
-        data.page_heading = page_heading || "Latest Articles";
-        saveBlogData(data);
+        const data = readJsonFile(blogPostsDataFile, []);
+        data.page_heading = page_heading;
+        writeJsonFile(blogPostsDataFile, data);
         res.redirect('/blog-posts?success=Page heading updated');
     } catch (error) {
         console.error('Update heading error:', error);
@@ -1302,70 +1600,17 @@ app.post('/blog-posts/update-heading', isAuthenticated, (req, res) => {
     }
 });
 
-// Benefits Page
-const benefitsDataFile = path.join(__dirname, 'data', 'benefits.json');
-const recipesDataFile = path.join(__dirname, 'data', 'recipes.json');
-const getRecipesData = () => {
-    try {
-        return JSON.parse(fs.readFileSync(recipesDataFile, 'utf8'));
-    } catch {
-        return { recipes: [] };
-    }
-};
-
-const saveRecipesData = (data) => {
-    fs.writeFileSync(recipesDataFile, JSON.stringify(data, null, 2));
-};
-
-const getBenefitsData = () => {
-    try {
-        return JSON.parse(fs.readFileSync(benefitsDataFile, 'utf8'));
-    } catch {
-        return { faqs: [] };
-    }
-};
-
-const saveBenefitsData = (data) => {
-    fs.writeFileSync(benefitsDataFile, JSON.stringify(data, null, 2));
-};
-
-// GET - Benefits page
-app.get('/benefits-page', isAuthenticated, (req, res) => {
-    const data = getBenefitsData();
-    // Get all recipes from the recipes data file
-    const recipesData = getRecipesData();
-
-    res.render('benefits-page', {
-        activePage: 'benefits-page',
-        user: req.session.user,
-        data: data,
-        recipes: recipesData.recipes || [],
-        success: req.query.success || null,
-        error: req.query.error || null
-    });
-});
-
-// POST - Save Benefits page
 app.post('/benefits-page/save', isAuthenticated, (req, res) => {
     try {
         const { page_title, intro_paragraph, recipes, faq } = req.body;
-
-        // Process associated recipes
         let associatedRecipes = [];
-
         if (recipes && typeof recipes === 'object') {
-            // Convert recipes object to array if needed
             let recipesArray = Array.isArray(recipes) ? recipes : Object.values(recipes);
-
-            // Filter out empty recipes
             recipesArray = recipesArray.filter(r => r && (r.title || r.ingredients));
-
             if (recipesArray.length > 0) {
-                const recipesData = getRecipesData();
-
+                const recipesData = readJsonFile(recipesDataFile, []);
                 recipesArray.forEach((recipeData) => {
                     if (recipeData.id && recipeData.id !== '0' && recipeData.id !== 0) {
-                        // Update existing recipe
                         const existingIndex = recipesData.recipes.findIndex(r => r.id === parseInt(recipeData.id));
                         if (existingIndex !== -1) {
                             recipesData.recipes[existingIndex] = {
@@ -1380,10 +1625,8 @@ app.post('/benefits-page/save', isAuthenticated, (req, res) => {
                             associatedRecipes.push(parseInt(recipeData.id));
                         }
                     } else {
-                        // Create new recipe
                         const newId = recipesData.recipes.length > 0 ?
                             Math.max(...recipesData.recipes.map(r => r.id)) + 1 : 1;
-
                         const newRecipe = {
                             id: newId,
                             title: recipeData.title || `Recipe ${newId}`,
@@ -1393,13 +1636,11 @@ app.post('/benefits-page/save', isAuthenticated, (req, res) => {
                             frequency: recipeData.frequency || "",
                             shelfLife: recipeData.shelfLife || ""
                         };
-
                         recipesData.recipes.push(newRecipe);
                         associatedRecipes.push(newId);
                     }
                 });
-
-                saveRecipesData(recipesData);
+                writeJsonFile(recipesDataFile, recipesData);
             }
         }
 
@@ -1417,13 +1658,13 @@ app.post('/benefits-page/save', isAuthenticated, (req, res) => {
         }
 
         const data = {
-            page_title: page_title || "Castor Oil Benefits & Uses",
+            page_title: page_title,
             intro_paragraph: intro_paragraph || "",
             associated_recipes: associatedRecipes,
             faqs: formattedFaqs
         };
 
-        saveBenefitsData(data);
+        writeJsonFile(benefitsDataFile, data);
         res.redirect('/benefits-page?success=Benefits page saved successfully');
     } catch (error) {
         console.error('Save benefits error:', error);
@@ -1431,18 +1672,17 @@ app.post('/benefits-page/save', isAuthenticated, (req, res) => {
     }
 });
 
-// POST - Move FAQ up
 app.post('/benefits-page/faq/move-up/:id', isAuthenticated, (req, res) => {
     try {
         const faqId = parseInt(req.params.id);
-        const data = getBenefitsData();
+        const data = readJsonFile(benefitsDataFile, []);
         const index = data.faqs.findIndex(f => f.id === faqId);
 
         if (index > 0) {
             const temp = data.faqs[index];
             data.faqs[index] = data.faqs[index - 1];
             data.faqs[index - 1] = temp;
-            saveBenefitsData(data);
+            writeJsonFile(benefitsDataFile, data);
         }
 
         res.redirect('/benefits-page?success=FAQ moved up');
@@ -1451,43 +1691,41 @@ app.post('/benefits-page/faq/move-up/:id', isAuthenticated, (req, res) => {
         res.redirect('/benefits-page?error=Failed to move FAQ');
     }
 });
-// POST - Delete recipe
-// POST - Delete recipe
+
 app.post('/benefits-page/recipe/delete/:id', isAuthenticated, (req, res) => {
     try {
         const recipeId = parseInt(req.params.id);
-        // Check if recipe exists before deleting
-        const recipesData = getRecipesData();
+
+        const recipesData = readJsonFile(recipesDataFile, []);
         const recipeExists = recipesData.recipes.some(r => r.id === recipeId);
         if (!recipeExists) {
             return res.redirect('/benefits-page?error=Recipe not found');
         }
 
-        // Delete from recipes.json
         recipesData.recipes = recipesData.recipes.filter(r => r.id !== recipeId);
-        saveRecipesData(recipesData);
-        // Remove from associated_recipes in benefits.json
-        const benefitsData = getBenefitsData();
+        writeJsonFile(recipesDataFile, recipesData);
+
+        const benefitsData = readJsonFile(benefitsDataFile, []);
         benefitsData.associated_recipes = benefitsData.associated_recipes.filter(id => id !== recipeId);
-        saveBenefitsData(benefitsData);
+        writeJsonFile(benefitsDataFile, benefitsData);
         res.redirect('/benefits-page?success=Recipe deleted successfully');
     } catch (error) {
         console.error('Delete recipe error:', error);
         res.redirect('/benefits-page?error=Failed to delete recipe: ' + error.message);
     }
 });
-// POST - Move FAQ down
+
 app.post('/benefits-page/faq/move-down/:id', isAuthenticated, (req, res) => {
     try {
         const faqId = parseInt(req.params.id);
-        const data = getBenefitsData();
+        const data = readJsonFile(benefitsDataFile, []);
         const index = data.faqs.findIndex(f => f.id === faqId);
 
         if (index !== -1 && index < data.faqs.length - 1) {
             const temp = data.faqs[index];
             data.faqs[index] = data.faqs[index + 1];
             data.faqs[index + 1] = temp;
-            saveBenefitsData(data);
+            writeJsonFile(benefitsDataFile, data);
         }
 
         res.redirect('/benefits-page?success=FAQ moved down');
@@ -1497,13 +1735,12 @@ app.post('/benefits-page/faq/move-down/:id', isAuthenticated, (req, res) => {
     }
 });
 
-// POST - Delete FAQ
 app.post('/benefits-page/faq/delete/:id', isAuthenticated, (req, res) => {
     try {
         const faqId = parseInt(req.params.id);
-        const data = getBenefitsData();
+        const data = readJsonFile(benefitsDataFile, []);
         data.faqs = data.faqs.filter(f => f.id !== faqId);
-        saveBenefitsData(data);
+        writeJsonFile(benefitsDataFile, data);
         res.redirect('/benefits-page?success=FAQ deleted');
     } catch (error) {
         console.error('Delete FAQ error:', error);
@@ -1511,209 +1748,174 @@ app.post('/benefits-page/faq/delete/:id', isAuthenticated, (req, res) => {
     }
 });
 
-// Homepage
-// ============ HOMEPAGE DATA MANAGEMENT ============
+app.post('/homepage/save', isAuthenticated, (req, res) => {
+    homepageUpload.single('book_showcase_image')(req, res, function (err) {
+        try {
+            if (err) {
+                console.error('Multer error:', err);
+                return res.redirect('/homepage?error=' + encodeURIComponent(err.message));
+            }
 
-const homepageDataFile = path.join(__dirname, 'data', 'homepage.json');
+            const {
+                site_title,
+                about_paragraph,
+                book_showcase_title,
+                book_showcase_description,
+                author_bio_heading,
+                author_bio_text,
+                contact_section_title,
+                contact_section_description,
+                journal_section_title
+            } = req.body;
 
-// Helper functions for Homepage
-const getHomepageData = () => {
-    try {
-        return JSON.parse(fs.readFileSync(homepageDataFile, 'utf8'));
-    } catch {
-        return { book_showcase: {}, author_bio: {}, contact_section: {}, journal_section: {} };
-    }
-};
+            const existingData = readJsonFile(homepageDataFile, []);
+            const oldImage = existingData.book_showcase?.image || "";
 
-const saveHomepageData = (data) => {
-    fs.writeFileSync(homepageDataFile, JSON.stringify(data, null, 2));
-};
+            let bookShowcaseImage = "";
+            const imageUrl = req.body.book_showcase_image_url || "";
+            const hasFile = req.file;
 
-// ============ HOMEPAGE ROUTES ============
+            if (hasFile) {
+                if (oldImage && oldImage.startsWith('/uploads/')) {
+                    deleteImageFile(oldImage);
+                }
+                bookShowcaseImage = '/uploads/' + req.file.filename;
+            } else if (imageUrl && imageUrl.trim() !== '') {
+                if (oldImage && oldImage.startsWith('/uploads/')) {
+                    deleteImageFile(oldImage);
+                }
+                bookShowcaseImage = imageUrl.trim();
+            } else {
+                if (oldImage && oldImage.startsWith('/uploads/')) {
+                    deleteImageFile(oldImage);
+                    bookShowcaseImage = "";
+                } else {
+                    bookShowcaseImage = "";
+                }
+            }
 
-// GET - Homepage
-app.get('/homepage', isAuthenticated, (req, res) => {
-    const data = getHomepageData();
-    res.render('homepage', {
-        activePage: 'homepage',
-        user: req.session.user,
-        data: data,
-        success: req.query.success || null,
-        error: req.query.error || null
+            const data = {
+                site_title: site_title,
+                about_paragraph: about_paragraph || "",
+                book_showcase: {
+                    title: book_showcase_title || "",
+                    description: book_showcase_description || "",
+                    image: bookShowcaseImage
+                },
+                author_bio: {
+                    heading: author_bio_heading,
+                    text: author_bio_text || ""
+                },
+                contact_section: {
+                    title: contact_section_title,
+                    description: contact_section_description || ""
+                },
+                journal_section: {
+                    title: journal_section_title
+                }
+            };
+
+            writeJsonFile(homepageDataFile, data);
+            res.redirect('/homepage?success=Homepage saved successfully');
+        } catch (error) {
+            console.error('Save homepage error:', error);
+            res.redirect('/homepage?error=' + encodeURIComponent('Failed to save homepage: ' + error.message));
+        }
     });
 });
 
-// POST - Save Homepage
-app.post('/homepage/save', isAuthenticated, (req, res) => {
-    try {
-        const { 
-            site_title, 
-            about_paragraph,
-            book_showcase_title,
-            book_showcase_description,
-            book_showcase_image,
-            author_bio_heading,
-            author_bio_text,
-            contact_section_title,
-            contact_section_description,
-            journal_section_title
-        } = req.body;
-        
-        const data = {
-            site_title: site_title || "Nora's Living",
-            about_paragraph: about_paragraph || "",
-            book_showcase: {
-                title: book_showcase_title || "",
-                description: book_showcase_description || "",
-                image: book_showcase_image || ""
-            },
-            author_bio: {
-                heading: author_bio_heading || "About Nora",
-                text: author_bio_text || ""
-            },
-            contact_section: {
-                title: contact_section_title || "Let's Connect",
-                description: contact_section_description || ""
-            },
-            journal_section: {
-                title: journal_section_title || "From the Journal"
-            }
-        };
-        
-        saveHomepageData(data);
-        res.redirect('/homepage?success=Homepage saved successfully');
-    } catch (error) {
-        console.error('Save homepage error:', error);
-        res.redirect('/homepage?error=Failed to save homepage');
-    }
-});
-
-// About Page
-let aboutPageData = {
-    page_title: "About Nora",
-    image_url: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=300",
-    bio_text: "I'm a researcher and writer focused on clean living.",
-    social_links: [
-        { label: "Instagram", url: "https://instagram.com/norasliving" },
-        { label: "YouTube", url: "https://youtube.com/@norasliving" }
-    ]
-};
-
-const aboutDataFile = path.join(__dirname, 'data', 'about.json');
-const getAboutData = () => {
-    try {
-        return JSON.parse(fs.readFileSync(aboutDataFile, 'utf8'));
-    } catch {
-        return { journey_timeline: [], values_pillars: [] };
-    }
-};
-
-const saveAboutData = (data) => {
-    fs.writeFileSync(aboutDataFile, JSON.stringify(data, null, 2));
-};
-
-// ============ ABOUT PAGE ROUTES ============
-app.get('/about-page', isAuthenticated, (req, res) => {
-    try {
-        const data = getAboutData();
-        res.render('about-page', {
-            activePage: 'about-page',
-            user: req.session.user,
-            data: data,
-            success: req.query.success || null,
-            error: req.query.error || null
-        });
-    } catch (error) {
-        console.error('GET About error:', error);
-        res.render('about-page', {
-            activePage: 'about-page',
-            user: req.session.user,
-            data: { journey_timeline: [], values_pillars: [] },
-            error: 'Failed to load about page data'
-        });
-    }
-});
-
 app.post('/about-page/save', isAuthenticated, (req, res) => {
-    try {
-        const { page_title, page_subtitle, photo, bio_text, journey, values } = req.body;
-        let formattedJourney = [];
-        if (journey) {
-            let journeyArray;
-
-            if (Array.isArray(journey)) {
-                journeyArray = journey;
-            } else if (typeof journey === 'object') {
-                journeyArray = Object.values(journey);
-            } else {
-                journeyArray = [];
+    upload.single('photo')(req, res, function (err) {
+        try {
+            if (err) {
+                console.error('Multer error:', err);
+                return res.redirect('/about-page?error=' + encodeURIComponent(err.message));
             }
-            formattedJourney = journeyArray
-                .filter(item => item && (item.year || item.title || item.description))
-                .map((item, index) => {
-                    return {
+
+            const { page_title, page_subtitle, bio_text, journey, values, cropped_image, photo_url } = req.body;
+
+            const existingData = readJsonFile(aboutDataFile, []);
+            const oldPhoto = existingData.photo || "";
+
+            let photo = "";
+
+            // Check for cropped image data
+            if (cropped_image && cropped_image.startsWith('data:image/')) {
+                if (oldPhoto && oldPhoto.startsWith('/uploads/')) {
+                    deleteImageFile(oldPhoto);
+                }
+                photo = saveBase64Image(cropped_image);
+            } else if (req.file) {
+                if (oldPhoto && oldPhoto.startsWith('/uploads/')) {
+                    deleteImageFile(oldPhoto);
+                }
+                photo = '/uploads/' + req.file.filename;
+            } else if (photo_url && photo_url.trim() !== '') {
+                if (oldPhoto && oldPhoto.startsWith('/uploads/')) {
+                    deleteImageFile(oldPhoto);
+                }
+                photo = photo_url.trim();
+            } else {
+                if (oldPhoto && oldPhoto.startsWith('/uploads/')) {
+                    deleteImageFile(oldPhoto);
+                    photo = "";
+                } else {
+                    photo = "";
+                }
+            }
+
+            let formattedJourney = [];
+            if (journey) {
+                let journeyArray = Array.isArray(journey) ? journey : Object.values(journey);
+                formattedJourney = journeyArray
+                    .filter(item => item && (item.year || item.title || item.description))
+                    .map((item, index) => ({
                         id: Date.now() + index,
                         year: String(item.year || "").trim(),
                         title: String(item.title || "").trim(),
                         description: String(item.description || "").trim()
-                    };
-                })
-                .filter(item => item.year || item.title || item.description);
-        }
-
-        let formattedValues = [];
-        if (values) {
-            let valuesArray;
-
-            if (Array.isArray(values)) {
-                valuesArray = values;
-            } else if (typeof values === 'object') {
-                valuesArray = Object.values(values);
-            } else {
-                valuesArray = [];
+                    }))
+                    .filter(item => item.year || item.title || item.description);
             }
 
-            formattedValues = valuesArray
-                .filter(item => item && (item.name || item.title || item.description))
-                .map((item, index) => {
-                    return {
+            let formattedValues = [];
+            if (values) {
+                let valuesArray = Array.isArray(values) ? values : Object.values(values);
+                formattedValues = valuesArray
+                    .filter(item => item && (item.name || item.title || item.description))
+                    .map((item, index) => ({
                         id: Date.now() + index,
                         name: String(item.name || "").trim(),
                         title: String(item.title || "").trim(),
                         description: String(item.description || "").trim()
-                    };
-                })
-                .filter(item => item.name || item.title || item.description);
+                    }))
+                    .filter(item => item.name || item.title || item.description);
+            }
+
+            const data = {
+                page_title: String(page_title || "About Nora").trim(),
+                page_subtitle: String(page_subtitle || "").trim(),
+                photo: photo,
+                bio_text: bio_text || "",
+                journey_timeline: formattedJourney,
+                values_pillars: formattedValues
+            };
+
+            writeJsonFile(aboutDataFile, data);
+            res.redirect('/about-page?success=About page saved successfully');
+        } catch (error) {
+            console.error('Error details:', error);
+            res.redirect('/about-page?error=' + encodeURIComponent('Failed to save about page: ' + error.message));
         }
-
-        const data = {
-            page_title: String(page_title || "About Nora").trim(),
-            page_subtitle: String(page_subtitle || "").trim(),
-            photo: String(photo || "").trim(),
-            bio_text: bio_text || "",
-            journey_timeline: formattedJourney,
-            values_pillars: formattedValues
-        };
-
-        // Save the data
-        saveAboutData(data);
-        // Redirect with success message
-        res.redirect('/about-page?success=About page saved successfully');
-    } catch (error) {
-        console.error('Error details:', error);
-        console.error('Error stack:', error.stack);
-        // Redirect with error message
-        const errorMessage = encodeURIComponent('Failed to save about page: ' + error.message);
-        res.redirect('/about-page?error=' + errorMessage);
-    }
+    });
 });
 
 app.post('/about-page/journey/delete/:id', isAuthenticated, (req, res) => {
     try {
         const journeyId = parseInt(req.params.id);
-        const data = getAboutData();
+        const data = readJsonFile(aboutDataFile, []);
         data.journey_timeline = data.journey_timeline.filter(j => j.id !== journeyId);
-        saveAboutData(data);
+        writeJsonFile(aboutDataFile, data);
         res.redirect('/about-page?success=Journey item deleted');
     } catch (error) {
         console.error('Delete journey error:', error);
@@ -1724,9 +1926,9 @@ app.post('/about-page/journey/delete/:id', isAuthenticated, (req, res) => {
 app.post('/about-page/values/delete/:id', isAuthenticated, (req, res) => {
     try {
         const valueId = parseInt(req.params.id);
-        const data = getAboutData();
+        const data = readJsonFile(aboutDataFile, []);
         data.values_pillars = data.values_pillars.filter(v => v.id !== valueId);
-        saveAboutData(data);
+        writeJsonFile(aboutDataFile, data);
         res.redirect('/about-page?success=Values pillar deleted');
     } catch (error) {
         console.error('Delete values error:', error);
@@ -1734,9 +1936,9 @@ app.post('/about-page/values/delete/:id', isAuthenticated, (req, res) => {
     }
 });
 
-// Start server
+// Start listening
 const PORT = 3000;
+
 app.listen(PORT, () => {
     console.log(`Admin panel running at http://localhost:${PORT}`);
-    console.log(`Login with: admin@example.com / admin123`);
 });
