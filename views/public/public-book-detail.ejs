@@ -1,0 +1,365 @@
+<%- include('../partials/public-header', { title: book.title + ' | ' + (settings?.siteTitle || 'Nora Hale Books'), settings: settings }) %>
+
+<style>
+    .book-detail {
+        max-width: 3xl;
+        margin: 0 auto;
+    }
+
+    /* NEW: Flex layout for image + content */
+    .book-detail .book-layout {
+        display: flex;
+        gap: 2.5rem;
+        align-items: flex-start;
+    }
+
+    .book-detail .book-image {
+        width: 200px;
+        min-width: 330px;
+        aspect-ratio: 3/4;
+    }
+
+    .book-detail .book-content {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .book-detail .book-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 0.25rem;
+    }
+
+    .book-detail .book-subtitle {
+        font-size: 0.875rem;
+        color: #4b5563;
+        font-weight: 500;
+        margin-bottom: 1rem;
+    }
+
+    .book-detail .book-description {
+        font-size: 0.8rem;
+        color: #4b5563;
+        line-height: 1.9;
+    }
+
+    .book-detail .book-description p {
+        margin-bottom: 1rem;
+    }
+
+    .book-detail .book-description p:last-child {
+        margin-bottom: 0;
+    }
+
+    .book-detail .book-author {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #9ca3af;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-top: 1rem;
+    }
+
+    .book-detail .section-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin: 2rem 0 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid #e5e7eb;
+    }
+
+    .book-detail .buy-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        margin: 1.5rem 0;
+    }
+
+    .book-detail .buy-buttons a {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.6rem 1.5rem;
+        background: #335F55;
+        color: white;
+        border-radius: 0.5rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        transition: background 0.2s;
+    }
+
+    .book-detail .buy-buttons a:hover {
+        background: #284B43;
+    }
+
+    .book-detail .benefits-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        /* Change from 1fr 1fr to 1fr 1fr 1fr */
+        gap: 1rem;
+        margin: 1rem 0;
+    }
+
+    .book-detail .benefit-item {
+        background: #f8fafc;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        border: 1px solid #e5e7eb;
+    }
+
+    .book-detail .benefit-item .benefit-title {
+        font-weight: 600;
+        color: #1f2937;
+        font-size: 0.9rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .book-detail .benefit-item .benefit-desc {
+        font-size: 0.85rem;
+        color: #6b7280;
+        line-height: 1.6;
+    }
+
+    .book-detail .toc-list {
+        list-style: none;
+        padding: 0;
+        margin: 1rem 0;
+    }
+
+    .book-detail .toc-list li {
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #e5e7eb;
+        /* Add horizontal line */
+        font-size: 0.95rem;
+        color: #4b5563;
+    }
+
+    .book-detail .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.875rem;
+        color: #6b7280;
+        margin-bottom: 1.5rem;
+        transition: color 0.2s;
+    }
+
+    .book-detail .back-link:hover {
+        color: #1f2937;
+    }
+
+    /* Newsletter Section */
+    .newsletter-section {
+        margin-top: 3rem;
+        padding-top: 2rem;
+        max-width: 600px;
+        border-top: 1px solid #e5e7eb;
+        text-align: center;
+        /* background: white; */
+        border: 1px solid #e5e7eb;
+        border-radius: 1rem;
+        padding: 2.5rem;
+        margin-top: 3rem;
+    }
+
+    .newsletter-section .newsletter-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 0.5rem;
+    }
+
+    .newsletter-section .newsletter-subtitle {
+        color: #6b7280;
+        margin-bottom: 1.5rem;
+    }
+
+    .newsletter-section form {
+        max-width: 400px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .newsletter-section input {
+        padding: 0.75rem 1rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.5rem;
+        font-size: 0.9rem;
+        transition: all 0.2s;
+        background: #f8fafc;
+        font-family: inherit;
+    }
+
+    .newsletter-section input:focus {
+        outline: none;
+        border-color: #059669;
+        box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
+        background: white;
+    }
+
+    .newsletter-section .btn-subscribe {
+        padding: 0.75rem 2rem;
+        background: #335F55;
+        color: white;
+        border: none;
+        border-radius: 0.5rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .newsletter-section .btn-subscribe:hover {
+        background: #284B43;
+    }
+
+    @media (max-width: 768px) {
+        .book-detail .book-layout {
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .book-detail .book-image {
+            width: 180px;
+            min-width: 180px;
+        }
+
+        .book-detail .book-title {
+            font-size: 1.8rem;
+            text-align: center;
+        }
+
+        .book-detail .book-subtitle {
+            text-align: center;
+        }
+
+        .book-detail .book-description {
+            text-align: center;
+        }
+
+        .book-detail .book-author {
+            text-align: center;
+        }
+
+        .book-detail .buy-buttons {
+            justify-content: center;
+        }
+
+        .newsletter-section {
+            padding: 1.5rem;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .book-detail .benefits-grid {
+            grid-template-columns: 1fr;
+            /* Stacks on mobile */
+        }
+    }
+</style>
+
+<div class="max-w-4xl mx-auto px-4 py-8 md:py-12">
+    <div class="book-detail">
+
+        <!-- Back Link -->
+        <a href="/books" class="back-link">
+            <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Books
+        </a>
+
+        <!-- NEW: Flex container for image + content -->
+        <div class="book-layout">
+            <!-- Book Image -->
+            <img src="<%= book.cover_image %>" alt="<%= book.title %>" class="book-image">
+
+            <!-- Book Content -->
+            <div class="book-content">
+                <!-- Book Title -->
+                <h3 class="book-title"><%= book.title %></h3>
+                <% if (book.subtitle) { %>
+                <p class="book-subtitle"><i><%= book.subtitle %></i></p>
+                <% } %>
+
+                <!-- Book Description -->
+                <div class="book-description">
+                    <%- book.description %>
+                </div>
+
+                <!-- Author -->
+                <!-- <div class="book-author"><%= book.author %></div> -->
+
+                <!-- Buy Buttons -->
+                <% if (book.buy_buttons && book.buy_buttons.length > 0) { %>
+                <div class="buy-buttons">
+                    <% book.buy_buttons.forEach(btn => { %>
+                    <a href="<%= btn.url %>" target="_blank" rel="noopener noreferrer">
+                        <%= btn.label %> <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+                    </a>
+                    <% }) %>
+                </div>
+                <% } %>
+            </div>
+        </div>
+
+        <!-- Benefits / What's Inside -->
+        <% if (book.benefits && book.benefits.length > 0) { %>
+        <h2 class="section-title text-center">What's Inside</h2>
+        <div class="benefits-grid">
+            <% book.benefits.forEach(benefit => { %>
+            <div class="benefit-item">
+                <div class="benefit-title"><%= benefit.title %></div>
+                <div class="benefit-desc"><%= benefit.description %></div>
+            </div>
+            <% }) %>
+        </div>
+        <% } %>
+
+        <!-- Table of Contents -->
+        <% if (book.table_of_contents && book.table_of_contents.length > 0) { %>
+        <div class="max-w-2xl mx-auto"> <!-- Add this wrapper -->
+            <h2 class="section-title text-center">Table of Contents</h2>
+            <ul class="toc-list">
+                <% let number = 1; book.table_of_contents.forEach(chapter => { %>
+                <li><span class="font-bold text-green-800"><%= String(number++).padStart(2, '0') %></span> &nbsp &nbsp
+                    <%= chapter %></li>
+                <% }) %>
+            </ul>
+        </div> <!-- Close wrapper -->
+        <% } %>
+
+        <!-- Medical Note -->
+        <% if (book.medical_note) { %>
+        <div class="max-w-2xl mx-auto text-center">
+            <div class="mt-6 p-4 text-sm  ">
+                <%- book.medical_note %>
+            </div>
+        </div>
+        <% } %>
+
+        <!-- Newsletter Section -->
+        <div class="flex justify-center">
+            <div class="newsletter-section">
+                <h3 class="newsletter-title">Nora's Notes on Natural Living</h3>
+                <p class="newsletter-subtitle">
+                    Thoughts about good ingredients, simple recipes, and a cleaner kind of life. Sign up for her
+                    newsletter,
+                    delivered to your inbox.
+                </p>
+                <form action="/newsletter/subscribe" method="POST">
+                    <input type="text" name="name" placeholder="Name" required>
+                    <input type="email" name="email" placeholder="Email" required>
+                    <button type="submit" class="btn-subscribe">Subscribe</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/public-footer', { settings: settings }) %>

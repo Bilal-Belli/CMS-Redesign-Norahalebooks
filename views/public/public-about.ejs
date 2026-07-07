@@ -1,0 +1,380 @@
+<%- include('../partials/public-header', { title: (settings?.siteTitle || 'Nora Hale Books') + ' | About', settings: settings }) %>
+
+<style>
+    .about-section {
+        margin-bottom: 4rem;
+    }
+
+    /* Split layout for Header elements */
+    .bio-header-layout {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 2rem;
+        margin-bottom: 2.5rem;
+        /* Space before the paragraph block starts */
+    }
+
+    /* Left-aligned Title & Subtitle block */
+    .bio-titles {
+        flex: 1;
+    }
+
+    .bio-titles .bio-headline {
+        font-family: 'Playfair Display', serif;
+        font-size: 3rem;
+        /* Large and bold title */
+        font-weight: 800;
+        color: #111827;
+        margin-bottom: 0.5rem;
+    }
+
+    .bio-titles .bio-subtitle {
+        font-size: 1.25rem;
+        color: #4b5563;
+        font-weight: 400;
+    }
+
+    /* Perfect Circle Photo on the Right with Green Shadow */
+    .bio-image-wrapper {
+        position: relative;
+    }
+
+    .bio-image-wrapper .bio-image {
+        width: 280px;
+        height: 280px;
+        min-width: 280px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 4px solid white;
+        /* Custom smooth green/teal drop shadow matching the image mockup */
+        box-shadow: 0 10px 105px 35px #03ffc438;
+    }
+
+    /* Full width paragraph block below the headers */
+    .bio-paragraphs {
+        font-size: 0.9rem;
+        color: #374151;
+        line-height: 1.8;
+        max-width: 42rem;
+        /* Keeps reading line length comfortable */
+        margin-left: auto;
+        /* Centers the paragraph block gracefully */
+        margin-right: auto;
+    }
+
+    .bio-paragraphs p {
+        margin-bottom: 1.25rem;
+    }
+
+    .bio-paragraphs p:last-child {
+        margin-bottom: 0;
+    }
+
+    .go-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.875rem;
+        color: #6b7280;
+        margin-bottom: 1.5rem;
+        transition: color 0.2s;
+    }
+
+    .go-link:hover {
+        color: #1f2937;
+    }
+    /* Responsive adjustment for tablets and phones */
+    @media (max-width: 768px) {
+        .bio-header-layout {
+            flex-direction: column-reverse;
+            /* Puts image neatly on top on mobile screens */
+            text-align: center;
+            gap: 1.5rem;
+        }
+
+        .bio-titles .bio-headline {
+            font-size: 2.25rem;
+        }
+
+        .bio-image-wrapper .bio-image {
+            width: 180px;
+            height: 180px;
+            min-width: 180px;
+        }
+
+        .bio-paragraphs {
+            text-align: left;
+            padding: 0 0.5rem;
+        }
+    }
+
+
+
+    .about-section:last-child {
+        margin-bottom: 0;
+    }
+
+    .about-section .section-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 2.25rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+
+    /* Bio Section Styling */
+    .bio-content {
+        display: flex;
+        flex-direction: row-reverse;
+        /* Places image on the right */
+        gap: 3.5rem;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .bio-content .bio-image {
+        width: 240px;
+        height: 240px;
+        min-width: 240px;
+        object-fit: cover;
+        border-radius: 50%;
+        /* Keeps image in a perfect circle */
+        border: 4px solid white;
+        box-shadow: 0 10px 90px rgba(0, 62, 47, 0.22);
+        /* Subtle green drop-shadow */
+    }
+
+    .bio-content .bio-text {
+        font-size: 1.1rem;
+        color: #4b5563;
+        line-height: 1.8;
+        flex: 1;
+    }
+
+    .bio-content .bio-text p {
+        margin-bottom: 1rem;
+    }
+
+    .bio-content .bio-text p:last-child {
+        margin-bottom: 0;
+    }
+
+    .bio-content .bio-text .bio-headline {
+        font-family: 'Playfair Display', serif;
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 0.75rem;
+    }
+
+    /* Horizontal Journey Timeline Styling */
+    .journey-timeline {
+        position: relative;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 2rem;
+        padding-top: 2rem;
+        margin-top: 1rem;
+    }
+
+    /* Horizontal line intersecting the timeline */
+    .journey-timeline::before {
+        content: '';
+        position: absolute;
+        top: calc(2rem + 6px);
+        /* Centers line perfectly with the 12px dots */
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: #e5e7eb;
+        z-index: 1;
+    }
+
+    .journey-item {
+        position: relative;
+        flex: 1;
+        text-align: center;
+        z-index: 2;
+    }
+
+    /* Timeline Dots placement */
+    .journey-item::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background: #335F55;
+        border: 3px solid white;
+        box-shadow: 0 0 0 1px #335F55;
+    }
+
+    .journey-item .journey-year {
+        font-size: 0.7rem;
+        font-weight: 600;
+        color: #335F55;
+        margin-top: 1.75rem;
+        margin-bottom: 0.5rem;
+        letter-spacing: 0.05em;
+    }
+
+    .journey-item .journey-title {
+        font-weight: 700;
+        color: #1f2937;
+        font-size: 0.8rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .journey-item .journey-desc {
+        font-size: 0.7rem;
+        color: #6b7280;
+        line-height: 1.6;
+        padding: 0 0.1rem;
+    }
+
+    /* Values Grid Section */
+    .values-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1rem;
+    }
+
+    .value-card {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 1rem;
+        padding: 2rem;
+        text-align: left;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+    }
+
+    .value-card .value-name {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.35rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 0.5rem;
+    }
+
+    .value-card .value-desc {
+        font-size: 0.95rem;
+        color: #6b7280;
+        line-height: 1.6;
+    }
+
+    /* Responsive Breakpoints */
+    @media (max-width: 768px) {
+        .bio-content {
+            flex-direction: column;
+            /* Stack vertically on small mobile displays */
+            align-items: center;
+            text-align: center;
+            gap: 2rem;
+        }
+
+        .bio-content .bio-image {
+            width: 200px;
+            height: 200px;
+            min-width: 200px;
+        }
+
+        .journey-timeline {
+            flex-direction: column;
+            gap: 2.5rem;
+            padding-top: 0;
+            padding-left: 1.5rem;
+        }
+
+        .journey-timeline::before {
+            top: 0;
+            bottom: 0;
+            left: 5px;
+            width: 2px;
+            height: 100%;
+        }
+
+        .journey-item {
+            text-align: left;
+        }
+
+        .journey-item::before {
+            left: -1.25rem;
+            top: 5px;
+            transform: none;
+        }
+
+        .journey-item .journey-year {
+            margin-top: 0;
+            margin-bottom: 0.25rem;
+        }
+    }
+</style>
+
+<div class="max-w-4xl mx-auto px-4 py-12 md:py-16">
+    <div class="about-section">
+        <div class="bio-header-layout">
+            <div class="bio-titles">
+                <h1 class="bio-headline">
+                    <%= data.page_title %>
+                </h1>
+                <p class="bio-subtitle">
+                    <%= data.page_subtitle %>
+                </p>
+            </div>
+            <div class="bio-image-wrapper">
+                <% if (data.photo) { %>
+                <img src="<%= data.photo %>" alt="Nora Hale" class="bio-image">
+                <% } %>
+            </div>
+        </div>
+
+        <div class="bio-paragraphs">
+            <% if (data.bio_text) { %>
+            <%- data.bio_text %>
+            <% } %>
+        </div>
+    </div>
+
+    <% if (data.journey_timeline && data.journey_timeline.length > 0) { %>
+    <div class="about-section">
+        <h2 class="section-title">Nora's Journey</h2>
+        <div class="journey-timeline">
+            <% data.journey_timeline.forEach(item => { %>
+            <div class="journey-item">
+                <div class="journey-year"><%= item.year %></div>
+                <div class="journey-title"><%= item.title %></div>
+                <div class="journey-desc"><%= item.description %></div>
+            </div>
+            <% }) %>
+        </div>
+    </div>
+    <% } %>
+
+    <% if (data.values_pillars && data.values_pillars.length > 0) { %>
+    <div class="about-section">
+        <h2 class="section-title">What Nora Believes</h2>
+        <div class="values-grid">
+            <% data.values_pillars.forEach(value => { %>
+            <div class="value-card">
+                <div class="value-name"><%= value.name || value.title %></div>
+                <div class="value-desc"><%= value.description %></div>
+            </div>
+            <% }) %>
+        </div>
+    </div>
+    <% } %>
+
+    <a href="/books" class="go-link">
+        Explore Books <i data-lucide="arrow-right" class="w-4 h-4"></i>
+    </a>
+</div>
+
+<%- include('../partials/public-footer', { settings: settings }) %>

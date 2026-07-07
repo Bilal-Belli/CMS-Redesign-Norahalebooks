@@ -1,0 +1,139 @@
+<%- include('../partials/public-header', { title: (settings?.siteTitle || 'Nora Hale Books') + ' | Blog', settings: settings }) %>
+
+<div class="max-w-3xl mx-auto px-4 py-8 md:py-12">
+    
+    <!-- Blog Header -->
+    <div class="mb-10 text-center">
+        <h1 class="serif-title text-4xl md:text-5xl font-bold text-gray-900 mb-3">Blogs</h1>
+        <p class="text-gray-500 text-lg max-w-2xl mx-auto">
+            Thoughts on natural wellness, ancient remedies, and simple living.
+        </p>
+    </div>
+
+    <div class="grid grid-cols-1 gap-8">
+        
+        <!-- Main Content -->
+        <div class="space-y-8">
+            
+            <!-- Search & Categories -->
+            <div class="space-y-4">
+                <div class="relative">
+                    <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"></i>
+                    <input type="text" placeholder="Search articles..." 
+                        class="search-input w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg bg-white text-sm focus:outline-none transition-all">
+                </div>
+                
+                <!-- <div class="flex flex-wrap gap-2">
+                    <button class="category-tag active">All</button>
+                    <% if (categories && categories.length > 0) { %>
+                        <% categories.forEach(cat => { %>
+                            <button class="category-tag"><%= cat %></button>
+                        <% }) %>
+                    <% } %>
+                </div> -->
+                <div class="flex flex-wrap gap-2">
+    <button class="category-tag filter-btn active" data-category="all">All</button>
+    <% if (categories && categories.length > 0) { %>
+        <% categories.forEach(cat => { %>
+            <button class="category-tag filter-btn" data-category="<%= cat.toLowerCase() %>"><%= cat %></button>
+        <% }) %>
+    <% } %>
+</div>
+            </div>
+
+            <!-- Blog Posts -->
+            <div class="space-y-10">
+                <% posts.forEach(post => { %>
+                    <% if (post.is_published) { %>
+                        <article class="post-card space-y-3 border-b border-gray-100 pb-8 last:border-0 last:pb-0" data-category="<%= (post.category || 'Uncategorized').toLowerCase() %>">
+                            
+                            <div class="flex items-center gap-3 text-xs text-gray-400">
+                                <span class="category-tag bg-emerald-50 text-emerald-700"><%= post.category || 'Uncategorized' %></span>
+                                <span><%= post.read_time || '5 min read' %></span>
+                                <span>•</span>
+                                <span><%= post.formatted_date_short %></span>
+                            </div>
+
+                            <h2 class="serif-title text-2xl md:text-3xl font-bold text-gray-900 hover:text-emerald-800 transition-colors leading-tight">
+                                <a href="/blog/<%= post.slug %>"><%= post.title %></a>
+                            </h2>
+
+                            <p class="text-gray-500 leading-relaxed">
+                                <%= post.excerpt || post.description.replace(/<[^>]*>/g, '').substring(0, 180) %>...
+                            </p>
+
+                            <div class="pt-1">
+                                <a href="/blog/<%= post.slug %>" class="inline-flex items-center gap-2 text-sm font-medium text-emerald-700 hover:text-emerald-900 transition-colors">
+                                    Read More <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                                </a>
+                            </div>
+
+                        </article>
+                    <% } %>
+                <% }) %>
+
+                <% if (posts.filter(p => p.is_published).length === 0) { %>
+                    <div class="text-center py-16 bg-white border border-gray-100 rounded-xl text-gray-400">
+                        <i data-lucide="file-text" class="w-12 h-12 mx-auto mb-3 text-gray-300"></i>
+                        <p class="text-sm">No articles published yet. Check back soon!</p>
+                    </div>
+                <% } %>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<%- include('../partials/public-footer', { settings: settings }) %>
+
+<script>
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    const searchInput = document.querySelector('.search-input');
+    const posts = document.querySelectorAll('article.post-card');
+
+    let currentCategory = 'all';
+    let searchQuery = '';
+
+    // Main filter function
+    function applyFilters() {
+        posts.forEach(post => {
+            const postCategory = post.getAttribute('data-category') || '';
+            const postText = post.textContent.toLowerCase();
+
+            // Check if post matches selected category
+            const matchesCategory = (currentCategory === 'all' || postCategory === currentCategory);
+            // Check if post matches search query
+            const matchesSearch = postText.includes(searchQuery);
+
+            // Show post only if it satisfies both conditions
+            if (matchesCategory && matchesSearch) {
+                post.style.display = 'block';
+            } else {
+                post.style.display = 'none';
+            }
+        });
+    }
+
+    // Category click handler
+    filterButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Update active UI state
+            filterButtons.forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+
+            // Update state and apply filter
+            currentCategory = this.getAttribute('data-category');
+            applyFilters();
+        });
+    });
+
+    // Search input handler
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            searchQuery = this.value.toLowerCase();
+            applyFilters();
+        });
+    }
+</script>

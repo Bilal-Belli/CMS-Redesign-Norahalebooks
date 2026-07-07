@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title><%= title || settings?.siteTitle || 'Nora Hale Books' %></title>
+        <link rel="icon" type="image/png" href="/favicon.png">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script src="https://unpkg.com/lucide@latest"></script>
+        <style>
+            body {
+                font-family: 'Plus Jakarta Sans', sans-serif;
+                background: #faf9f6;
+            }
+
+            .serif-title {
+                font-family: 'Playfair Display', serif;
+            }
+
+            .blog-content h2 {
+                font-size: 1.5rem;
+                font-weight: 600;
+                margin: 1.5rem 0 0.75rem;
+            }
+
+            .blog-content h3 {
+                font-size: 1.25rem;
+                font-weight: 600;
+                margin: 1.25rem 0 0.5rem;
+            }
+
+            .blog-content p {
+                margin-bottom: 1rem;
+                line-height: 1.8;
+            }
+
+            .blog-content ul {
+                list-style: disc;
+                padding-left: 1.5rem;
+                margin-bottom: 1rem;
+            }
+
+            .blog-content ol {
+                list-style: decimal;
+                padding-left: 1.5rem;
+                margin-bottom: 1rem;
+            }
+
+            .blog-content blockquote {
+                border-left: 3px solid #059669;
+                padding-left: 1rem;
+                margin: 1rem 0;
+                color: #4b5563;
+                font-style: italic;
+            }
+
+            .blog-content a {
+                color: #059669;
+                text-decoration: underline;
+            }
+
+            .blog-content img {
+                max-width: 100%;
+                border-radius: 0.5rem;
+                margin: 1.5rem 0;
+            }
+
+            .category-tag {
+                display: inline-block;
+                padding: 0.25rem 0.75rem;
+                border-radius: 9999px;
+                font-size: 0.7rem;
+                font-weight: 500;
+                background: #f3f4f6;
+                color: #4b5563;
+                transition: all 0.2s;
+            }
+
+            .category-tag:hover {
+                background: #059669;
+                color: white;
+            }
+
+            .category-tag.active {
+                background: #059669;
+                color: white;
+            }
+
+            .post-card {
+                transition: all 0.2s;
+            }
+
+            .post-card:hover {
+                transform: translateY(-2px);
+            }
+
+            .search-input:focus {
+                border-color: #059669;
+                box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
+            }
+        </style>
+    </head>
+
+    <body>
+        <!-- Header -->
+<header class="sticky top-0 z-50 bg-white/75 backdrop-blur border-b border-gray-200">
+
+    <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+
+        <a href="/" class="serif-title text-2xl font-bold text-gray-900">
+            <img src="/home-logo.png" alt="Nora Hale Books Logo" class="h-14 w-auto">
+        </a>
+
+        <!-- Desktop -->
+        <nav class="hidden md:flex items-center gap-7 text-sm font-medium text-gray-600">
+            <a href="/" class="hover:text-emerald-700 transition">Home</a>
+            <a href="/about" class="hover:text-emerald-700 transition">About Nora</a>
+            <a href="/books" class="hover:text-emerald-700 transition">Books</a>
+            <a href="/benefits" class="hover:text-emerald-700 transition">Recipes</a>
+            <a href="/favorites" class="hover:text-emerald-700 transition">Favorites</a>
+            <a href="/blog" class="hover:text-emerald-700 transition">Blogs</a>
+            <a href="/contact" class="hover:text-emerald-700 transition">Connect</a>
+        </nav>
+
+        <!-- Mobile button -->
+        <button id="menu-btn"
+    class="md:hidden w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-100">
+
+    <i id="menu-open" data-lucide="menu" class="w-6 h-6"></i>
+    <i id="menu-close" data-lucide="x" class="w-6 h-6 hidden"></i>
+
+</button>
+
+    </div>
+
+    <!-- Mobile Menu -->
+    <div id="mobile-menu"
+        class="hidden md:hidden absolute top-full left-0 w-full bg-white border-b border-gray-200 shadow-lg">
+
+        <nav class="flex flex-col py-3">
+
+            <a href="/" class="px-6 py-3 hover:bg-gray-50 transition">
+                Home
+            </a>
+
+            <a href="/about" class="px-6 py-3 hover:bg-gray-50 transition">
+                About Nora
+            </a>
+
+            <a href="/books" class="px-6 py-3 hover:bg-gray-50 transition">
+                Books
+            </a>
+
+            <a href="/benefits" class="px-6 py-3 hover:bg-gray-50 transition">
+                Recipes
+            </a>
+
+            <a href="/favorites" class="px-6 py-3 hover:bg-gray-50 transition">
+                Favorites
+            </a>
+
+            <a href="/blog"
+                class="px-6 py-3 bg-emerald-50 text-emerald-700 font-semibold border-l-4 border-emerald-600">
+                Blog
+            </a>
+
+            <a href="/contact" class="px-6 py-3 hover:bg-gray-50 transition">
+                Connect
+            </a>
+
+        </nav>
+
+    </div>
+
+</header>

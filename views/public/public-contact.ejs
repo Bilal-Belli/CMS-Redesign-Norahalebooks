@@ -1,0 +1,376 @@
+<%- include('../partials/public-header', { title: (settings?.siteTitle || 'Nora Hale Books') + ' | Contact', settings: settings }) %>
+
+<style>
+    .contact-grid {
+        display: grid;
+        grid-template-columns: 2fr 1.5fr;
+        gap: 3rem;
+        align-items: start;
+    }
+
+    .contact-form .form-group {
+        margin-bottom: 1.25rem;
+    }
+
+    .contact-form label {
+        display: block;
+        font-weight: 500;
+        color: #1f2937;
+        margin-bottom: 0.25rem;
+        font-size: 0.875rem;
+    }
+
+    .contact-form input,
+    .contact-form textarea {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.5rem;
+        font-size: 0.95rem;
+        transition: all 0.2s;
+        background: #f8fafc;
+        font-family: inherit;
+    }
+
+    .contact-form input:focus,
+    .contact-form textarea:focus {
+        outline: none;
+        border-color: #059669;
+        box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
+        background: white;
+    }
+
+    .contact-form textarea {
+        min-height: 120px;
+        resize: vertical;
+    }
+
+    .contact-form .btn-send {
+        padding: 0.75rem 2.5rem;
+        background: #335F55;
+        color: white;
+        border: none;
+        border-radius: 0.5rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .contact-form .btn-send:hover {
+        background: #284B43;
+    }
+
+    .contact-note {
+        margin-top: 1.5rem;
+        padding: 1.5rem;
+        background: #f8fafc;
+        border-radius: 0.75rem;
+        border: 1px solid #e5e7eb;
+        text-align: center;
+        color: #6b7280;
+        font-size: 0.9rem;
+    }
+
+    .contact-note .signature {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.25rem;
+        color: #1f2937;
+        margin-top: 0.25rem;
+    }
+
+    /* Photo Strip */
+    .photo-strip {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+    }
+
+    .photo-strip img {
+        width: 100%;
+        aspect-ratio: 1/1;
+        object-fit: cover;
+        border-radius: 0.75rem;
+        border: 1px solid #e5e7eb;
+        transition: all 0.2s;
+    }
+
+    .photo-strip img:hover {
+        transform: scale(1.02);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .photo-strip .photo-placeholder {
+        aspect-ratio: 1/1;
+        background: #f8fafc;
+        border-radius: 0.75rem;
+        border: 1px dashed #e5e7eb;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #d1d5db;
+    }
+
+    .photo-strip .photo-placeholder i {
+        width: 2rem;
+        height: 2rem;
+    }
+
+    .faq-section {
+        margin-top: 3rem;
+        padding-top: 2rem;
+    }
+
+    .faq-section h3 {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 1.5rem;
+    }
+
+    .faq-grid {
+        width: 100%;
+    }
+
+    .faq-item {
+        cursor: pointer;
+    }
+
+    .faq-question {
+        font-weight: 500;
+        color: #111827;
+        font-size: 0.98rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .faq-answer {
+        color: #6b7280;
+        font-size: 0.95rem;
+        line-height: 1.65;
+        padding-top: 0.75rem;
+        display: none;
+    }
+
+    .faq-answer.open {
+        display: block;
+    }
+
+    .faq-toggle-icon {
+        transition: transform 0.25s ease;
+        flex-shrink: 0;
+        width: 18px;
+        height: 18px;
+        color: #9ca3af;
+    }
+
+    .faq-toggle-icon.open {
+        transform: rotate(180deg);
+    }
+
+    /* Newsletter Section */
+    .newsletter-section {
+        margin-top: 3rem;
+        padding-top: 2rem;
+        max-width: 600px;
+        border-top: 1px solid #e5e7eb;
+        text-align: center;
+        /* background: white; */
+        border: 1px solid #e5e7eb;
+        border-radius: 1rem;
+        padding: 2.5rem;
+        margin-top: 3rem;
+    }
+
+    .newsletter-section .newsletter-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 0.5rem;
+    }
+
+    .newsletter-section .newsletter-subtitle {
+        color: #6b7280;
+        margin-bottom: 1.5rem;
+    }
+
+    .newsletter-section form {
+        max-width: 400px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .newsletter-section input {
+        padding: 0.75rem 1rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.5rem;
+        font-size: 0.9rem;
+        transition: all 0.2s;
+        background: #f8fafc;
+        font-family: inherit;
+    }
+
+    .newsletter-section input:focus {
+        outline: none;
+        border-color: #059669;
+        box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
+        background: white;
+    }
+
+    .newsletter-section .btn-subscribe {
+        padding: 0.75rem 2rem;
+        background: #335F55;
+        color: white;
+        border: none;
+        border-radius: 0.5rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .newsletter-section .btn-subscribe:hover {
+        background: #284B43;
+    }
+
+    @media (max-width: 768px) {
+        .contact-grid {
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        .photo-strip {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .faq-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .newsletter-section {
+            padding: 1.5rem;
+        }
+    }
+</style>
+
+<div class="max-w-5xl mx-auto px-4 py-8 md:py-12">
+    <!-- Page Header -->
+    <div class="mb-10">
+        <h1 class="serif-title text-4xl md:text-5xl font-bold text-gray-900 mb-3">
+            <%= data.page_title %>
+        </h1>
+        <p class="text-gray-500 max-w-2xl leading-relaxed">
+            <%- data.intro_paragraph %>
+        </p>
+        <% if (data.lets_connect_note) { %>
+        <div class="mt-3 text-sm text-gray-400 italic">
+            <%- data.lets_connect_note %>
+        </div>
+        <% } %>
+    </div>
+
+    <!-- Contact Grid: Form + Photo Strip -->
+    <div class="contact-grid">
+        <!-- Contact Form -->
+        <div class="contact-form">
+            <form action="/contact/submit" method="POST">
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text" id="name" name="name" placeholder="Your name" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" placeholder="Your email address" required>
+                </div>
+                <div class="form-group">
+                    <label for="message">Message</label>
+                    <textarea id="message" name="message" placeholder="Your message..." required></textarea>
+                </div>
+                <div class="form-group text-center">
+                    <button type="submit" class="btn-send">Send message</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Photo Strip (right side) -->
+        <div>
+            <% if (data.photo_strip && data.photo_strip.length > 0) { %>
+            <div class="photo-strip">
+                <% data.photo_strip.forEach(photo => { %>
+                <img src="<%= photo %>" alt="Nora's space">
+                <% }) %>
+            </div>
+            <% } else { %>
+            <div class="photo-strip">
+                <div class="photo-placeholder"><i data-lucide="image"></i></div>
+                <div class="photo-placeholder"><i data-lucide="image"></i></div>
+                <div class="photo-placeholder"><i data-lucide="image"></i></div>
+                <div class="photo-placeholder"><i data-lucide="image"></i></div>
+            </div>
+            <% } %>
+        </div>
+    </div>
+
+    <div class="flex justify-center">
+        <% if (data.faqs && data.faqs.length > 0) { %>
+        <div class="faq-section w-full max-w-3xl">
+            <div class="text-center">
+                <h3>Frequently Asked</h3>
+            </div>
+            <div class="faq-grid divide-y divide-gray-200">
+                <% data.faqs.forEach((faq, index) => { %>
+                <div class="faq-item py-4" onclick="toggleFaq(this)">
+                    <div class="faq-question">
+                        <span><%= faq.question %></span>
+                        <i data-lucide="chevron-down" class="faq-toggle-icon"></i>
+                    </div>
+
+                    <div class="faq-answer">
+                        <p><%= faq.answer %></p>
+                    </div>
+                </div>
+                <% }) %>
+            </div>
+        </div>
+        <% } %>
+    </div>
+
+    <!-- Newsletter Section -->
+    <div class="flex justify-center">
+        <div class="newsletter-section">
+            <h3 class="newsletter-title">Nora's Notes on Natural Living</h3>
+            <p class="newsletter-subtitle">
+                Thoughts about good ingredients, simple recipes, and a cleaner kind of life. Sign up for her newsletter,
+                delivered to your inbox.
+            </p>
+            <form action="/newsletter/subscribe" method="POST">
+                <input type="text" name="name" placeholder="Name" required>
+                <input type="email" name="email" placeholder="Email" required>
+                <button type="submit" class="btn-subscribe">Subscribe</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // FAQ Toggle Function
+    function toggleFaq(element) {
+        const answer = element.querySelector('.faq-answer');
+        const icon = element.querySelector('.faq-toggle-icon');
+
+        if (answer) {
+            answer.classList.toggle('open');
+        }
+        if (icon) {
+            icon.classList.toggle('open');
+        }
+    }
+</script>
+
+<%- include('../partials/public-footer', { settings: settings }) %>

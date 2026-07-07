@@ -1,0 +1,236 @@
+<%- include('../partials/public-header', { title: (settings?.siteTitle || 'Nora Hale Books') + ' | Books', settings: settings }) %>
+
+<style>
+    .book-row {
+        display: flex;
+        gap: 2.5rem;
+        padding: 2rem 0;
+        border-bottom: 1px solid #e5e7eb;
+        align-items: flex-start;
+    }
+
+    .book-row:last-child {
+        border-bottom: none;
+    }
+
+    .book-row .book-image {
+        width: 280px;
+        min-width: 280px;
+        aspect-ratio: 3/4;
+        background: #f8fafc;
+    }
+
+    .book-row .book-content {
+        flex: 1;
+        padding-top: 0.25rem;
+    }
+
+    .book-row .book-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 0.25rem;
+        text-transform: uppercase;
+    }
+
+    .book-row .book-subtitle {
+        font-size: 1rem;
+        color: #4b5563;
+        font-weight: 500;
+        margin-bottom: 0.75rem;
+    }
+
+    .book-row .book-description {
+        font-size: 0.9rem;
+        color: #6b7280;
+        line-height: 1.8;
+    }
+
+    .book-row .book-description p {
+        margin-bottom: 0.75rem;
+    }
+
+    .book-row .book-description p:last-child {
+        margin-bottom: 0;
+    }
+
+    .book-row .book-author {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #9ca3af;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-top: 1rem;
+    }
+
+    .book-row .btn-learn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-top: 0.75rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #059669;
+        transition: color 0.2s;
+    }
+
+    .book-row .btn-learn:hover {
+        color: #065f46;
+    }
+
+    /* Newsletter Section */
+    .newsletter-section {
+        margin-top: 3rem;
+        padding-top: 2rem;
+        max-width: 600px;
+        border-top: 1px solid #e5e7eb;
+        text-align: center;
+        /* background: white; */
+        border: 1px solid #e5e7eb;
+        border-radius: 1rem;
+        padding: 2.5rem;
+        margin-top: 3rem;
+    }
+
+    .newsletter-section .newsletter-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 0.5rem;
+    }
+
+    .newsletter-section .newsletter-subtitle {
+        color: #6b7280;
+        margin-bottom: 1.5rem;
+    }
+
+    .newsletter-section form {
+        max-width: 400px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .newsletter-section input {
+        padding: 0.75rem 1rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.5rem;
+        font-size: 0.9rem;
+        transition: all 0.2s;
+        background: #f8fafc;
+        font-family: inherit;
+    }
+
+    .newsletter-section input:focus {
+        outline: none;
+        border-color: #059669;
+        box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
+        background: white;
+    }
+
+    .newsletter-section .btn-subscribe {
+        padding: 0.75rem 2rem;
+        background: #335F55;
+        color: white;
+        border: none;
+        border-radius: 0.5rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .newsletter-section .btn-subscribe:hover {
+        background: #284B43;
+    }
+
+    @media (max-width: 640px) {
+        .book-row {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 1rem;
+        }
+
+        .book-row .book-image {
+            width: 160px;
+            min-width: unset;
+        }
+
+        .book-row .btn-learn {
+            justify-content: center;
+        }
+
+        .newsletter-section {
+            padding: 1.5rem;
+        }
+    }
+</style>
+
+<div class="max-w-4xl mx-auto px-4 py-8 md:py-12">
+
+    <!-- Books Header -->
+    <div class="mb-8 text-center">
+        <h1 class="serif-title text-4xl md:text-5xl font-bold text-gray-900 mb-3">Books</h1>
+        <p class="text-gray-500 text-lg">
+            A growing library of practical guides for everyday wellness.
+        </p>
+    </div>
+
+    <!-- Books List -->
+    <% if (books && books.length > 0) { %>
+    <div class="books-list">
+        <% books.forEach(book => { %>
+        <div class="book-row">
+            <!-- Book Image -->
+            <img src="<%= book.cover_image %>" alt="<%= book.title %>" class="book-image">
+
+            <!-- Book Content -->
+            <div class="book-content">
+                <h2 class="book-title"><%= book.title %></h2>
+                <% if (book.subtitle) { %>
+                <p class="book-subtitle"><%= book.subtitle %></p>
+                <% } %>
+
+                <div class="book-description">
+                    <%- book.description %>
+                </div>
+
+                <a href="/books/<%= book.slug %>" class="btn-learn">
+                    Learn more <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </a>
+
+                <!-- <div class="book-author"><%= book.author || 'NORA HALE, RN' %></div> -->
+            </div>
+        </div>
+        <% }) %>
+    </div>
+    <% } else { %>
+    <div class="text-center py-16 bg-white border border-gray-100 rounded-xl text-gray-400">
+        <i data-lucide="book-open" class="w-12 h-12 mx-auto mb-3 text-gray-300"></i>
+        <p class="text-sm">No books published yet. Check back soon!</p>
+    </div>
+    <% } %>
+
+    <!-- Newsletter Section -->
+    <div class="flex justify-center">
+        <div class="newsletter-section">
+            <h3 class="newsletter-title">Nora's Notes on Natural Living</h3>
+            <p class="newsletter-subtitle">
+                Thoughts about good ingredients, simple recipes, and a cleaner kind of life. Sign up for her
+                newsletter,
+                delivered to your inbox.
+            </p>
+            <form action="/newsletter/subscribe" method="POST">
+                <input type="text" name="name" placeholder="Name" required>
+                <input type="email" name="email" placeholder="Email" required>
+                <button type="submit" class="btn-subscribe">Subscribe</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/public-footer', { settings: settings }) %>

@@ -1,0 +1,221 @@
+<%- include('../partials/public-header', { title: (settings?.siteTitle || 'Nora Hale Books') + ' | Benefits', settings: settings }) %>
+
+<style>
+    .recipe-card {
+        /* background: white; */
+        border: 1px solid #e5e7eb;
+        border-radius: 1rem;
+        padding: 1.5rem;
+        transition: all 0.2s;
+    }
+
+    /* .recipe-card:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        border-color: #d1d5db;
+    } */
+    .recipe-section-label {
+        font-size: 0.65rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        /* color: #9ca3af; */
+        margin-bottom: 0.25rem;
+    }
+
+    .recipe-section-content {
+        font-size: 0.875rem;
+        color: #1f2937;
+        padding: 0.5rem 0.75rem;
+        /* background: #f8fafc; */
+        border-radius: 0.5rem;
+        /* border: 1px solid #e5e7eb; */
+        white-space: pre-wrap;
+        font-family: inherit;
+        min-height: 2.5rem;
+        line-height: 1.6;
+    }
+
+    .faq-item {
+        border-bottom: 1px solid #e5e7eb;
+        padding: 1.25rem 0;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .faq-item:last-child {
+        border-bottom: none;
+    }
+
+    .faq-item:hover .faq-question {
+        color: #059669;
+    }
+
+    .faq-question {
+        font-weight: 500;
+        color: #1f2937;
+        transition: color 0.2s;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .faq-answer {
+        color: #4b5563;
+        padding-top: 0.75rem;
+        line-height: 1.6;
+        font-size: 0.95rem;
+        display: none;
+    }
+
+    .faq-answer.open {
+        display: block;
+    }
+
+    .faq-answer p {
+        margin-bottom: 0.5rem;
+    }
+
+    .faq-answer p:last-child {
+        margin-bottom: 0;
+    }
+
+    .faq-toggle-icon {
+        transition: transform 0.3s ease;
+        flex-shrink: 0;
+    }
+
+    .faq-toggle-icon.open {
+        transform: rotate(180deg);
+    }
+</style>
+
+<div class="max-w-3xl mx-auto px-4 py-8 md:py-12">
+
+    <!-- Benefits Header -->
+    <div class="mb-10 text-center">
+        <h1 class="serif-title text-4xl md:text-4xl font-bold text-gray-900 mb-3">
+            <%= data.page_title %>
+        </h1>
+        <div class="text-gray-500 text-lg max-w-1xl leading-relaxed">
+            <%- data.intro_paragraph %>
+        </div>
+    </div>
+
+    <!-- Recipes Section -->
+    <% if (recipes && recipes.length > 0) { %>
+    <div class="mb-12">
+        <div class="space-y-6">
+            <% recipes.forEach((recipe, index) => { %>
+            <div class="recipe-card">
+                <h3 class="serif-title text-2xl font-bold text-gray-900 mb-4">
+                    <%= recipe.title %>
+                </h3>
+
+                <!-- Ingredients -->
+                <div class="mb-4">
+                    <div class="recipe-section-label">Ingredients</div>
+                    <div class="recipe-section-content"><%= recipe.ingredients %></div>
+                </div>
+
+                <!-- Instructions -->
+                <div class="mb-4">
+                    <div class="recipe-section-label">Instructions</div>
+                    <div class="recipe-section-content"><%= recipe.instructions %></div>
+                </div>
+
+                <!-- How To Use (full width, below) -->
+                <% if (recipe.howToUse) { %>
+                <div class="mt-4">
+                    <div class="recipe-section-label">To Use</div>
+                    <div class="recipe-section-content"><%= recipe.howToUse %></div>
+                </div>
+                <% } %>
+
+                <!-- Horizontal Line -->
+                <hr class="my-6 border-gray-200">
+
+                <!-- Frequency & Shelf Life (same row) -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <% if (recipe.frequency) { %>
+                    <div>
+                        <div class="recipe-section-label">Frequency of Use</div>
+                        <div class="recipe-section-content"><%= recipe.frequency %></div>
+                    </div>
+                    <% } %>
+                    <% if (recipe.shelfLife) { %>
+                    <div>
+                        <div class="recipe-section-label">Shelf Life</div>
+                        <div class="recipe-section-content"><%= recipe.shelfLife %></div>
+                    </div>
+                    <% } %>
+                </div>
+            </div>
+            <% }) %>
+        </div>
+    </div>
+    <% } %>
+
+    <!-- FAQ Section -->
+    <% if (data.faqs && data.faqs.length > 0) { %>
+    <div class="p-6 md:p-8 ">
+        <h2 class="serif-title text-2xl font-bold text-gray-900 mb-2 text-center">Frequently Asked Questions</h2>
+
+        <div class="faq-list">
+            <% data.faqs.forEach((faq, index) => { %>
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-question">
+                    <span><%= faq.question %></span>
+                    <i data-lucide="chevron-down" class="faq-toggle-icon w-5 h-5 text-gray-400"></i>
+                </div>
+                <div class="faq-answer">
+                    <p><%= faq.answer %></p>
+                </div>
+            </div>
+            <% }) %>
+        </div>
+
+        <!-- CTA Section -->
+        <div class="mt-8 pt-6 border-t border-gray-100 text-center">
+            <p class="text-gray-600 mb-4">Ready to dive deeper?</p>
+            <a href="/books"
+                class="inline-block bg-[#335F55] hover:bg-[#284B43] text-white px-6 py-3 rounded-lg text-sm font-medium transition-colors">
+                Explore the Books
+            </a>
+        </div>
+    </div>
+    <% } %>
+
+</div>
+
+<script>
+    // FAQ Toggle Function
+    function toggleFaq(element) {
+        const answer = element.querySelector('.faq-answer');
+        const icon = element.querySelector('.faq-toggle-icon');
+
+        // Close all other FAQs
+        document.querySelectorAll('.faq-item').forEach(item => {
+            if (item !== element) {
+                const otherAnswer = item.querySelector('.faq-answer');
+                const otherIcon = item.querySelector('.faq-toggle-icon');
+                if (otherAnswer) {
+                    otherAnswer.classList.remove('open');
+                    if (otherIcon) {
+                        otherIcon.classList.remove('open');
+                    }
+                }
+            }
+        });
+
+        // Toggle current FAQ
+        if (answer) {
+            answer.classList.toggle('open');
+        }
+        if (icon) {
+            icon.classList.toggle('open');
+        }
+    }
+</script>
+
+<%- include('../partials/public-footer', { settings: settings }) %>

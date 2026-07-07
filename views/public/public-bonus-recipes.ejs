@@ -1,0 +1,115 @@
+<%- include('../partials/public-header', { title: settings?.siteTitle || 'Nora Hale Books', settings: settings }) %>
+<style>
+    .contact-form-section {
+        max-width: 500px;
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 1rem;
+        padding: 1.5rem;
+        text-align: center;
+    }
+
+    .contact-form-section .contact-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 0.5rem;
+    }
+
+    .contact-subtitle {
+        color: #6b7280;
+        margin-bottom: 1.5rem;
+    }
+
+    .contact-form-section form {
+        max-width: 500px;
+        margin: 0 auto;
+    }
+
+    .contact-form-section .form-group {
+        margin-bottom: 1rem;
+    }
+
+    .contact-form-section input,
+    .contact-form-section textarea {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.5rem;
+        font-size: 0.9rem;
+        transition: all 0.2s;
+        background: #f8fafc;
+        font-family: inherit;
+    }
+
+    .contact-form-section input:focus,
+    .contact-form-section textarea:focus {
+        outline: none;
+        border-color: #059669;
+        box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
+        background: white;
+    }
+
+    .contact-form-section textarea {
+        min-height: 100px;
+        resize: vertical;
+    }
+
+    .contact-form-section .btn-send {
+        padding: 0.75rem 2.5rem;
+        background: #335F55;
+        color: white;
+        border: none;
+        border-radius: 0.5rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background 0.2s;
+        width: 100%;
+    }
+
+    .contact-form-section .btn-send:hover {
+        background: #284B43;
+    }
+
+    .contact-form-section .contact-note {
+        margin-top: 1rem;
+        font-size: 0.8rem;
+        color: #9ca3af;
+    }
+
+    @media (max-width: 768px) {
+        .contact-form-section {
+            padding: 1.5rem;
+        }
+    }
+</style>
+<div
+    class="w-full h-[50vh] bg-[#C3DFDB] flex items-center justify-center px-4 sm:px-12 md:px-24 lg:px-32 xl:px-64 2xl:px-64">
+    <div class="text-center">
+        <%- data.title %>
+        <%- data.message %>
+    </div>
+
+</div>
+
+<!-- Contact Section -->
+<div class="my-16">
+    <div class="contact-form-section max-w-md mx-auto px-4 py-4">
+        <form action="/contact/submit" method="POST">
+            <div class="form-group">
+                <input type="text" name="name" placeholder="Your name" required>
+            </div>
+            <div class="form-group">
+                <input type="email" name="email" placeholder="Your email address" required>
+            </div>
+            <div class="form-group">
+                <textarea name="message" placeholder="Your message..." required></textarea>
+            </div>
+            <button type="submit" class="btn-send">Send Me the Recipes</button>
+        </form>
+    </div>
+</div>
+
+<%- include('../partials/public-footer', { settings: settings }) %>

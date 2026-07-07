@@ -1,0 +1,528 @@
+<%- include('../partials/public-header', { title: settings?.siteTitle || 'Nora Hale Books', settings: settings }) %>
+
+<style>
+    .section-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 2rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 1.5rem;
+    }
+
+    .section-title .highlight {
+        color: #335F55;
+    }
+
+    .book-card {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 1rem;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        height: 100%;
+    }
+
+    .book-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    }
+
+    .book-card .book-image {
+        width: 20%;
+        /* max-width: 30px; */
+        /* aspect-ratio: 3/4; */
+        object-fit: cover;
+        /* background: #f8fafc; */
+    }
+
+    .book-card .book-content {
+        padding: 1.25rem;
+    }
+
+    .book-card .book-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 0.25rem;
+    }
+
+    .book-card .book-subtitle {
+        font-size: 0.8rem;
+        color: #6b7280;
+        margin-bottom: 0.5rem;
+    }
+
+    .book-card .book-excerpt {
+        font-size: 0.85rem;
+        color: #6b7280;
+        line-height: 1.6;
+    }
+
+    .book-card .btn-learn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-top: 0.75rem;
+        font-size: 0.8rem;
+        font-weight: 500;
+        color: #059669;
+        transition: color 0.2s;
+    }
+
+    .book-card .btn-learn:hover {
+        color: #065f46;
+    }
+
+    .blog-card {
+        padding: 1.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .blog-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    }
+
+    .blog-card .blog-meta {
+        font-size: 0.75rem;
+        color: #9ca3af;
+        margin-bottom: 0.5rem;
+    }
+
+    .blog-card .blog-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 0.5rem;
+        line-height: 1.4;
+    }
+
+    .blog-card .blog-title a {
+        color: inherit;
+        text-decoration: none;
+        transition: color 0.2s;
+    }
+
+    .blog-card .blog-title a:hover {
+        color: #335F55;
+    }
+
+    .blog-card .blog-excerpt {
+        font-size: 0.85rem;
+        color: #6b7280;
+        line-height: 1.6;
+    }
+
+    .blog-card .btn-read {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-top: 0.75rem;
+        font-size: 0.8rem;
+        font-weight: 500;
+        color: #059669;
+        transition: color 0.2s;
+    }
+
+    .blog-card .btn-read:hover {
+        color: #065f46;
+    }
+
+    .author-section {
+        display: grid;
+        gap: 2.5rem;
+    }
+
+    .author-section .author-content {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .author-section .author-content .author-heading {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #1f2937;
+    }
+
+    .author-section .author-content .author-text {
+        color: #4b5563;
+        line-height: 1.8;
+        font-size: 0.95rem;
+    }
+
+    .author-section .author-content .author-text p {
+        margin-bottom: 0.75rem;
+    }
+
+    .author-section .author-content .author-text p:last-child {
+        margin-bottom: 0;
+    }
+
+    .contact-form-section {
+        max-width: 500px;
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 1rem;
+        padding: 1.5rem;
+        text-align: center;
+    }
+
+    .contact-form-section .contact-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 0.5rem;
+    }
+
+    .contact-subtitle {
+        color: #6b7280;
+        margin-bottom: 1.5rem;
+    }
+
+    .contact-form-section form {
+        max-width: 500px;
+        margin: 0 auto;
+    }
+
+    .contact-form-section .form-group {
+        margin-bottom: 1rem;
+    }
+
+    .contact-form-section input,
+    .contact-form-section textarea {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.5rem;
+        font-size: 0.9rem;
+        transition: all 0.2s;
+        background: #f8fafc;
+        font-family: inherit;
+    }
+
+    .contact-form-section input:focus,
+    .contact-form-section textarea:focus {
+        outline: none;
+        border-color: #059669;
+        box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
+        background: white;
+    }
+
+    .contact-form-section textarea {
+        min-height: 100px;
+        resize: vertical;
+    }
+
+    .contact-form-section .btn-send {
+        padding: 0.75rem 2.5rem;
+        background: #335F55;
+        color: white;
+        border: none;
+        border-radius: 0.5rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background 0.2s;
+        width: 100%;
+    }
+
+    .contact-form-section .btn-send:hover {
+        background: #284B43;
+    }
+
+    .contact-form-section .contact-note {
+        margin-top: 1rem;
+        font-size: 0.8rem;
+        color: #9ca3af;
+    }
+
+    /* Newsletter Section */
+    .newsletter-section {
+        max-width: 600px;
+        margin: 3rem auto 0;
+        padding-top: 2rem;
+        border-top: 1px solid #e5e7eb;
+        text-align: center;
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 1rem;
+        padding: 2.5rem;
+    }
+
+
+    .newsletter-section form {
+        width: 100%;
+        /* max-width: 300px; */
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .newsletter-section input {
+        padding: 0.75rem 1rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.5rem;
+        font-size: 0.9rem;
+        transition: all 0.2s;
+        background: #f8fafc;
+        font-family: inherit;
+    }
+
+    .newsletter-section input:focus {
+        outline: none;
+        border-color: #059669;
+        box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
+        background: white;
+    }
+
+    .newsletter-section .btn-subscribe {
+        padding: 0.75rem 2rem;
+        background: #335F55;
+        color: white;
+        border: none;
+        border-radius: 0.5rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .newsletter-section .btn-subscribe:hover {
+        background: #284B43;
+    }
+
+    .book-row {
+        display: flex;
+        gap: 2.5rem;
+        padding: 2rem 0;
+        border-bottom: 1px solid #e5e7eb;
+        align-items: flex-start;
+    }
+
+    .book-row:last-child {
+        border-bottom: none;
+    }
+
+    .book-row .book-image {
+        width: 280px;
+        min-width: 280px;
+        aspect-ratio: 3/4;
+        background: #f8fafc;
+    }
+
+    .book-row .book-content {
+        flex: 1;
+        padding-top: 0.25rem;
+    }
+
+    .book-row .book-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 0.25rem;
+        text-transform: uppercase;
+    }
+
+    .book-row .book-description {
+        font-size: 0.9rem;
+        color: #6b7280;
+        line-height: 1.8;
+    }
+
+    .book-row .book-description p {
+        margin-bottom: 0.75rem;
+    }
+
+    .book-row .book-description p:last-child {
+        margin-bottom: 0;
+    }
+
+    .btn-learn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-top: 0.75rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #059669;
+        transition: color 0.2s;
+    }
+
+    .btn-learn:hover {
+        color: #065f46;
+    }
+
+    @media (max-width: 768px) {
+        .author-section {
+            grid-template-columns: 1fr;
+            text-align: center;
+            padding: 1.5rem;
+        }
+
+        .author-section .author-image {
+            max-width: 200px;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+        }
+
+        .contact-form-section {
+            padding: 1.5rem;
+        }
+
+        .newsletter-section {
+            padding: 1.5rem;
+        }
+
+        .btn-learn {
+            justify-content: center;
+        }
+
+        .book-row {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 1rem;
+        }
+
+        .book-row .book-image {
+            width: 160px;
+            min-width: unset;
+        }
+
+        .book-row .btn-learn {
+            justify-content: center;
+        }
+    }
+</style>
+
+<!-- Big logo section -->
+<div class="w-full h-screen bg-[#C3DFDB] flex items-center justify-center px-4 sm:px-12 md:px-24 lg:px-32 xl:px-64 2xl:px-64">
+    <img src="/home-logo.png" alt="Image" class="w-128 h-128 object-contain" />
+</div>
+
+<div class="max-w-3xl mx-auto px-4 py-8 md:py-12 space-y-16">
+
+    
+
+    <!-- Featured Books Section -->
+    <div class="book-row">
+        <%  { %>
+        <img src="<%= homepageData.book_showcase.image %>" class="book-image">
+        <div class="book-content">
+            <h3 class="book-title"><%= homepageData.book_showcase.title %></h3>
+            <div class="book-excerpt">
+                <%- homepageData.book_showcase.description %>
+            </div>
+            <a href="/books" class="btn-learn">
+                Learn more <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </a>
+        </div><% } %>
+    </div>
+
+    <!-- Author Bio Section -->
+    <% if (homepageData.author_bio?.text || aboutData.bio_text) { %>
+    <div>
+        <h2 class="section-title text-center"><%= homepageData.author_bio?.heading || 'About the Author' %></h2>
+        <div class="author-section">
+            <div class="author-content">
+                <div class="author-text">
+                    <%- homepageData.author_bio.text %>
+                </div>
+                <div class="text-center">
+                    <a href="/about"
+                        class="inline-flex items-center gap-2 text-sm font-medium text-emerald-700 hover:text-emerald-900 transition-colors">
+                        Read more <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <% } %>
+
+    <!-- Recent Blog Posts -->
+    <% if (posts && posts.length > 0) { %>
+    <div>
+        <h2 class="section-title text-center"><%= homepageData.journal_section.title %></h2>
+        <div>
+            <% posts.forEach(post => { %>
+            <div class="blog-card">
+                <div class="blog-meta">
+                    <span><%= post.formatted_date %></span>
+                    <% if (post.category) { %>
+                    <span class="ml-2 text-emerald-700">• <%= post.category %></span>
+                    <% } %>
+                </div>
+                <h3 class="blog-title">
+                    <a href="/blog/<%= post.slug %>"><%= post.title %></a>
+                </h3>
+                <div class="blog-excerpt">
+                    <%= post.excerpt %>
+                </div>
+            </div>
+            <% }) %>
+        </div>
+        <div class="text-center mt-8">
+            <a href="/blog"
+                class="inline-flex items-center gap-2 text-sm font-medium text-emerald-700 hover:text-emerald-900 transition-colors">
+                View all articles <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </a>
+        </div>
+    </div>
+    <% } %>
+
+    <!-- Contact Section -->
+    <div>
+        <h2 class="section-title text-center"><%= homepageData.contact_section.title %></h2>
+        <div class="contact-subtitle text-center">
+            <%- homepageData.contact_section.description %>
+            I personally read every message and will get back to you within 48 hours.
+        </div>
+
+        <div class="contact-form-section max-w-md mx-auto">
+            <form action="/contact/submit" method="POST">
+                <div class="form-group">
+                    <input type="text" name="name" placeholder="Your name" required>
+                </div>
+                <div class="form-group">
+                    <input type="email" name="email" placeholder="Your email address" required>
+                </div>
+                <div class="form-group">
+                    <textarea name="message" placeholder="Your message..." required></textarea>
+                </div>
+                <button type="submit" class="btn-send">Send message</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Newsletter Section -->
+    <div>
+        <h2 class="section-title text-center">Nora's Notes on Natural Living</h2>
+        <div class="contact-subtitle text-center">
+            Thoughts about good ingredients, simple recipes, and a cleaner kind of life. Sign up for her newsletter,
+            delivered to your inbox.
+        </div>
+        <div class="newsletter-section">
+            <form action="/newsletter/subscribe" method="POST" class="mx-auto w-full max-w-sm text-center">
+                <label for="name" class="block text-left">Name</label>
+                <input type="text" name="name" placeholder="Name" required
+                    class="w-full mb-3 px-3 py-2 border rounded" />
+                <label for="email" class="block text-left">Email</label>
+                <input type="email" name="email" placeholder="Email" required
+                    class="w-full mb-3 px-3 py-2 border rounded" />
+                <button type="submit"
+                    class="btn-subscribe w-full bg-blue-600 text-white py-2 rounded">Subscribe</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/public-footer', { settings: settings }) %>
