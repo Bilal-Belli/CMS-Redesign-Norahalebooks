@@ -1,5 +1,5 @@
-<%- include('partials/header') %>
-<%- include('partials/sidebar') %>
+<%- include('../partials/header') %>
+<%- include('../partials/sidebar') %>
 
 <!-- Quill.js CSS -->
 <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
@@ -83,8 +83,6 @@
 </style>
 
 <main class="flex-1 overflow-y-auto p-4 md:p-8">
-
-    <!-- Flash Messages -->
     <% if (success) { %>
     <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg flex items-center gap-2 mb-6">
         <i data-lucide="check-circle" class="h-5 w-5 text-green-500"></i>
@@ -175,11 +173,11 @@
 
     <div class="flex items-center justify-between gap-4 mb-6 md:mb-8">
         <h1 class="text-2xl md:text-3xl font-bold text-gray-900"><%= isEdit ? 'Edit Book' : 'New Book' %></h1>
-        <a href="/books"
+        <a href="/admin-books"
             class="bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium shadow-sm transition-colors">Cancel</a>
     </div>
 
-    <form action="/books/save" method="POST" class="space-y-6 max-w-4xl pb-12">
+    <form id="bookForm" action="/books/save" method="POST" enctype="multipart/form-data" class="space-y-6 max-w-4xl pb-12">
         <input type="hidden" name="id" value="<%= isEdit ? book.id : '' %>">
 
         <!-- Title -->
@@ -206,27 +204,39 @@
 
         <!-- Cover Image -->
         <div>
-            <label class="block text-sm font-medium text-gray-900 mb-2">Cover image URL</label>
-            <input type="text" name="cover_image" value="<%= isEdit ? book.cover_image : '' %>"
-                class="w-full bg-[#F8FAFC] border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition-all font-mono text-xs">
-            <% if (isEdit && book.cover_image) { %>
-            <div class="mt-3 w-32 aspect-[3/4] border border-gray-200 rounded-lg overflow-hidden bg-gray-50 shadow-sm">
-                <img src="<%= book.cover_image %>" class="w-full h-full object-cover">
-            </div>
-            <% } %>
-        </div>
+    <label class="block text-sm font-medium text-gray-900 mb-2">Cover image</label>
 
-        <!-- Description (Quill Editor) -->
+    <input type="file" name="cover_image_file" accept="image/*"
+        class="w-full bg-[#F8FAFC] border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition-all">
+
+    <p class="text-xs text-gray-400 mt-1.5">Or paste an image URL below</p>
+
+    <input type="text" name="cover_image" value="<%= isEdit ? book.cover_image : '' %>"
+        placeholder="https://..."
+        class="w-full mt-2 bg-[#F8FAFC] border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition-all font-mono text-xs">
+<% if (isEdit && book.cover_image) { %>
+<div class="mt-3 w-32 aspect-[3/4] border border-gray-200 rounded-lg overflow-hidden bg-gray-50 shadow-sm">
+    <img id="coverPreviewImg" src="<%= book.cover_image %>" class="w-full h-full object-cover">
+</div>
+<% } else { %>
+<div class="mt-3 w-32 aspect-[3/4] border border-gray-200 rounded-lg overflow-hidden bg-gray-50 shadow-sm">
+    <img id="coverPreviewImg" src="" class="w-full h-full object-cover">
+</div>
+<% } %>
+    
+</div>
+
+        <!-- Description -->
         <div>
             <label class="block text-sm font-medium text-gray-900 mb-2">Description</label>
             <p class="text-xs text-gray-400 mb-2">Bold, italic, lists, and links are supported.</p>
             <div class="quill-wrapper">
                 <div id="descriptionEditor"></div>
             </div>
-            <input type="hidden" name="description" id="descriptionInput" value='<%= isEdit ? book.description : '' %>'>
+            <input type="hidden" name="description" id="descriptionInput" value="<%- isEdit ? book.description : '' %>">
         </div>
 
-        <!-- Medical Note (Quill Editor) -->
+        <!-- Medical Note -->
         <div>
             <label class="block text-sm font-medium text-gray-900 mb-2">Medical / closing note</label>
             <p class="text-xs text-gray-400 mb-2">Optional closing note or disclaimer.</p>
@@ -234,7 +244,7 @@
                 <div id="medicalNoteEditor"></div>
             </div>
             <input type="hidden" name="medical_note" id="medicalNoteInput"
-                value='<%= isEdit ? book.medical_note : '' %>'>
+                value="<%- isEdit ? book.medical_note : '' %>">
         </div>
 
         <!-- Buy Buttons -->
@@ -373,14 +383,13 @@
                 class="bg-[#335F55] hover:bg-[#284B43] text-white px-6 py-2.5 rounded-lg text-sm font-medium tracking-wide shadow-sm transition-colors focus:outline-none">
                 <%= isEdit ? 'Save Book Changes' : 'Create Book' %>
             </button>
-            <a href="/books"
+            <a href="/admin-books"
                 class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-2.5 rounded-lg text-sm font-medium transition-colors">
                 Cancel
             </a>
         </div>
     </form>
     <% } %>
-
 </main>
 
 </div>
@@ -391,14 +400,12 @@
 <script>
     lucide.createIcons();
 
-    // ============ INITIALIZE QUILL EDITORS ============
-
     const toolbarOptions = [
         ['bold', 'italic', 'underline', 'strike'],
         ['blockquote', 'code-block'],
-        [{ 'header': [1, 2, 3, false] }],
-        [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-        [{ 'indent': '-1' }, { 'indent': '+1' }],
+        [{ header: [1, 2, 3, false] }],
+        [{ list: 'ordered' }, { list: 'bullet' }],
+        [{ indent: '-1' }, { indent: '+1' }],
         ['link', 'image'],
         ['clean']
     ];
@@ -406,7 +413,6 @@
     function initQuill(containerId, inputId, placeholder = '') {
         const container = document.getElementById(containerId);
         const input = document.getElementById(inputId);
-
         if (!container || !input) return null;
 
         const quill = new Quill(container, {
@@ -432,7 +438,38 @@
         lucide.createIcons();
     });
 
-    // ============ BUY BUTTONS ============
+    function collectBuyButtons() {
+    return [...document.querySelectorAll('.buy-button-row')]
+        .map(row => ({
+            label: row.querySelector('input[name^="buy_buttons_label_"]')?.value.trim() || '',
+            url: row.querySelector('input[name^="buy_buttons_url_"]')?.value.trim() || ''
+        }))
+        .filter(item => item.label || item.url);
+}
+
+function collectBenefits() {
+    return [...document.querySelectorAll('.benefit-row')]
+        .map(row => ({
+            title: row.querySelector('input[name^="benefits_title_"]')?.value.trim() || '',
+            description: row.querySelector('textarea[name^="benefits_desc_"]')?.value.trim() || ''
+        }))
+        .filter(item => item.title || item.description);
+}
+
+function collectTOC() {
+    return [...document.querySelectorAll('.toc-row')]
+        .map(row => row.querySelector('input[name^="toc_"]')?.value.trim() || '')
+        .filter(Boolean);
+}
+
+    const bookForm = document.getElementById('bookForm');
+    if (bookForm) {
+        bookForm.addEventListener('submit', function () {
+            document.getElementById('buyButtonsInput').value = JSON.stringify(collectBuyButtons());
+            document.getElementById('benefitsInput').value = JSON.stringify(collectBenefits());
+            document.getElementById('tocInput').value = JSON.stringify(collectTOC());
+        });
+    }
 
     let buyButtonCount = <%= isEdit && book.buy_buttons ? book.buy_buttons.length : 1 %>;
 
@@ -454,8 +491,6 @@
         buyButtonCount++;
         lucide.createIcons();
     }
-
-    // ============ BENEFITS ============
 
     let benefitCount = <%= isEdit && book.benefits ? book.benefits.length : 1 %>;
 
@@ -479,9 +514,11 @@
         benefitCount++;
         lucide.createIcons();
     }
-
-    // ============ TABLE OF CONTENTS ============
-
+function syncDynamicFields() {
+    document.getElementById('buyButtonsInput').value = JSON.stringify(collectBuyButtons());
+    document.getElementById('benefitsInput').value = JSON.stringify(collectBenefits());
+    document.getElementById('tocInput').value = JSON.stringify(collectTOC());
+}
     let tocCount = <%= isEdit && book.table_of_contents ? book.table_of_contents.length : 1 %>;
 
     function addTOC() {
@@ -500,8 +537,6 @@
         tocCount++;
         lucide.createIcons();
     }
-
-    // ============ SIDEBAR FUNCTIONS ============
 
     const menuToggle = document.getElementById('menu-toggle');
     const menuClose = document.getElementById('menu-close');
@@ -533,6 +568,27 @@
             closeMenu();
         }
     });
+
+    document.getElementById('bookForm')?.addEventListener('submit', function () {
+    syncDynamicFields();
+});
+
+function removeAndSync(btn) {
+    btn.closest('.buy-button-row, .benefit-row, .toc-row')?.remove();
+    syncDynamicFields();
+}
+</script>
+<script>
+const coverInput = document.querySelector('input[name="cover_image_file"]');
+const coverPreview = document.querySelector('#coverPreviewImg');
+
+if (coverInput) {
+    coverInput.addEventListener('change', function () {
+        const file = this.files[0];
+        if (!file) return;
+        if (coverPreview) coverPreview.src = URL.createObjectURL(file);
+    });
+}
 </script>
 </body>
 

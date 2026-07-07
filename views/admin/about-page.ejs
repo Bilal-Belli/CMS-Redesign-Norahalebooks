@@ -1,9 +1,12 @@
-<%- include('partials/header') %>
-<%- include('partials/sidebar') %>
+<%- include('../partials/header') %>
+<%- include('../partials/sidebar') %>
 
 <!-- Quill.js CSS -->
 <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-
+<!-- Cropper.js CSS -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
+<!-- Cropper.js JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 <style>
     .ql-container {
         font-size: 14px;
@@ -56,6 +59,15 @@
         border-radius: 0.75rem;
         border: 2px solid #e5e7eb;
     }
+
+    /* Add these styles */
+    #cropModal .cropper-container {
+        max-height: 60vh;
+    }
+
+    #cropModal .cropper-crop-box {
+        border-radius: 50%;
+    }
 </style>
 
 <main class="flex-1 overflow-y-auto p-4 md:p-8 space-y-10">
@@ -77,7 +89,7 @@
     </div>
     <% } %>
 
-    <form action="/about-page/save" method="POST" class="space-y-8 pb-16" id="aboutForm">
+    <form action="/about-page/save" method="POST" enctype="multipart/form-data" class="space-y-8 pb-16" id="aboutForm">
         <div class="space-y-1.5">
             <label class="block text-sm font-medium text-gray-900">Page title</label>
             <input type="text" name="page_title" value="<%= data.page_title || '' %>"
@@ -93,19 +105,64 @@
         <div class="space-y-1.5">
             <label class="block text-sm font-medium text-gray-900">My photo</label>
             <div class="space-y-3">
-                <input type="text" name="photo" value="<%= data.photo || '' %>" placeholder="Image URL"
+                <!-- Upload file input -->
+                <div>
+                    <input type="file" name="photo" id="photoInput" accept="image/*"
+                        class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200 cursor-pointer">
+                    <p class="text-xs text-gray-400 mt-1">Upload an image (JPEG, PNG, GIF, WebP - Max 5MB)</p>
+                </div>
+
+                <!-- OR enter URL -->
+                <div class="flex items-center gap-2 text-xs text-gray-400">
+                    <span>— or —</span>
+                </div>
+
+                <input type="text" name="photo_url" id="photoUrlInput" value="<%= data.photo || '' %>"
+                    placeholder="Enter image URL"
                     class="w-full bg-[#F8FAFC] border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition-all">
-                <% if (data.photo) { %>
-                <div class="relative inline-block">
-                    <img src="<%= data.photo %>" alt="Profile photo" class="photo-preview">
-                    <button type="button"
-                        onclick="document.querySelector('input[name=photo]').value=''; this.closest('.relative').remove();"
-                        class="absolute -top-2 -right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors shadow-lg">
-                        <i data-lucide="x" class="w-4 h-4"></i>
+
+                <!-- Hidden input for cropped image data -->
+                <input type="hidden" name="cropped_image" id="croppedImageInput">
+
+                <!-- Preview -->
+                <div id="photoPreview">
+                    <% if (data.photo) { %>
+                    <div class="relative inline-block" id="previewContainer">
+                        <img src="<%= data.photo %>" alt="Profile photo" class="photo-preview" id="profileImage">
+                        <button type="button" onclick="removePhoto()"
+                            class="absolute -top-2 -right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors shadow-lg">
+                            <i data-lucide="x" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+
+        <!-- Crop Modal -->
+        <div id="cropModal"
+            class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm hidden">
+            <div class="bg-white rounded-2xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-bold text-gray-900">Crop Image</h3>
+                    <button type="button" id="closeCropModal"
+                        class="p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
+                        <i data-lucide="x" class="w-5 h-5 text-gray-500"></i>
                     </button>
                 </div>
-                <% } %>
-                <p class="text-xs text-gray-400">Enter a URL to an image, or upload via the Images section.</p>
+
+                <div id="imageToCrop" class="bg-gray-50 rounded-lg overflow-hidden"></div>
+
+                <div class="flex gap-3 mt-4">
+                    <button type="button" id="cropBtn"
+                        class="bg-[#335F55] hover:bg-[#284B43] text-white px-6 py-2.5 rounded-lg text-sm font-medium transition-colors flex-1">
+                        Crop & Upload
+                    </button>
+                    <button type="button" id="cancelCropBtn"
+                        class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-2.5 rounded-lg text-sm font-medium transition-colors flex-1">
+                        Cancel
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -115,7 +172,8 @@
             <div class="quill-wrapper">
                 <div id="bioEditor"></div>
             </div>
-            <input type="hidden" name="bio_text" id="bioInput" value="<%- (data.bio_text || '').replace(/"/g, '&quot;') %>">
+            <input type="hidden" name="bio_text" id="bioInput"
+                value="<%- (data.bio_text || '').replace(/"/g, '&quot;') %>">
         </div>
 
         <hr class="border-gray-200 my-8">
@@ -132,7 +190,8 @@
             <div id="journey-container" class="space-y-4">
                 <% if (data.journey_timeline && data.journey_timeline.length > 0) { %>
                 <% data.journey_timeline.forEach((item, index) => { %>
-                <div class="bg-white border border-gray-200 rounded-xl p-5 shadow-sm group relative" data-id="<%= item.id %>">
+                <div class="bg-white border border-gray-200 rounded-xl p-5 shadow-sm group relative"
+                    data-id="<%= item.id %>">
                     <div class="flex items-start gap-4">
                         <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div class="space-y-1">
@@ -162,7 +221,8 @@
                 </div>
                 <% }); %>
                 <% } else { %>
-                <div class="text-center py-8 text-gray-400 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
+                <div
+                    class="text-center py-8 text-gray-400 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
                     <i data-lucide="clock" class="w-10 h-10 mx-auto mb-2 text-gray-300"></i>
                     <p class="text-sm">No journey items added yet.</p>
                 </div>
@@ -184,7 +244,8 @@
             <div id="values-container" class="space-y-4">
                 <% if (data.values_pillars && data.values_pillars.length > 0) { %>
                 <% data.values_pillars.forEach((item, index) => { %>
-                <div class="bg-white border border-gray-200 rounded-xl p-5 shadow-sm group relative" data-id="<%= item.id %>">
+                <div class="bg-white border border-gray-200 rounded-xl p-5 shadow-sm group relative"
+                    data-id="<%= item.id %>">
                     <div class="flex items-start gap-4">
                         <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div class="space-y-1">
@@ -214,7 +275,8 @@
                 </div>
                 <% }); %>
                 <% } else { %>
-                <div class="text-center py-8 text-gray-400 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
+                <div
+                    class="text-center py-8 text-gray-400 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
                     <i data-lucide="heart" class="w-10 h-10 mx-auto mb-2 text-gray-300"></i>
                     <p class="text-sm">No values pillars added yet.</p>
                 </div>
@@ -237,7 +299,7 @@
 <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         if (typeof lucide !== 'undefined') {
             lucide.createIcons();
         }
@@ -265,7 +327,7 @@
                 quill.root.innerHTML = input.value;
             }
 
-            quill.on('text-change', function() {
+            quill.on('text-change', function () {
                 input.value = quill.root.innerHTML;
             });
 
@@ -276,19 +338,19 @@
 
         const form = document.getElementById('aboutForm');
         if (form) {
-            form.addEventListener('submit', function() {
+            form.addEventListener('submit', function () {
                 const bioInput = document.getElementById('bioInput');
                 const editor = document.querySelector('#bioEditor .ql-editor');
                 if (bioInput && editor) bioInput.value = editor.innerHTML;
             });
         }
 
-        let journeyCount = <%= data.journey_timeline ? data.journey_timeline.length : 0 %>;
+        let journeyCount = <%= data.journey_timeline ?data.journey_timeline.length: 0 %>;
         const journeyContainer = document.getElementById('journey-container');
         const addJourneyBtn = document.getElementById('add-journey-btn');
 
         if (addJourneyBtn && journeyContainer) {
-            addJourneyBtn.addEventListener('click', function(e) {
+            addJourneyBtn.addEventListener('click', function (e) {
                 e.preventDefault();
                 const journeyMarkup = `
                 <div class="bg-white border border-gray-200 rounded-xl p-5 shadow-sm group relative">
@@ -324,12 +386,12 @@
             });
         }
 
-        let valuesCount = <%= data.values_pillars ? data.values_pillars.length : 0 %>;
+        let valuesCount = <%= data.values_pillars ?data.values_pillars.length: 0 %>;
         const valuesContainer = document.getElementById('values-container');
         const addValuesBtn = document.getElementById('add-values-btn');
 
         if (addValuesBtn && valuesContainer) {
-            addValuesBtn.addEventListener('click', function(e) {
+            addValuesBtn.addEventListener('click', function (e) {
                 e.preventDefault();
                 const valuesMarkup = `
                 <div class="bg-white border border-gray-200 rounded-xl p-5 shadow-sm group relative">
@@ -365,6 +427,251 @@
             });
         }
     });
+    // Add this in your script section at the bottom
+    document.addEventListener('DOMContentLoaded', function () {
+        // Update hidden input when file is selected
+        const fileInput = document.querySelector('input[type="file"][name="photo"]');
+        const urlInput = document.querySelector('input[name="photo_url"]');
+
+        if (fileInput && urlInput) {
+            fileInput.addEventListener('change', function () {
+                if (this.files && this.files[0]) {
+                    // Clear URL input when file is selected
+                    urlInput.value = '';
+
+                    // Show preview
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        // Remove old preview if exists
+                        const oldPreview = document.querySelector('.relative.inline-block');
+                        if (oldPreview) oldPreview.remove();
+
+                        // Create new preview
+                        const preview = document.createElement('div');
+                        preview.className = 'relative inline-block';
+                        preview.innerHTML = `
+                        <img src="${e.target.result}" alt="Profile photo" class="photo-preview">
+                        <button type="button" onclick="this.closest('.relative').remove(); document.querySelector('input[name=photo]').value='';"
+                            class="absolute -top-2 -right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors shadow-lg">
+                            <i data-lucide="x" class="w-4 h-4"></i>
+                        </button>
+                    `;
+                        fileInput.closest('.space-y-3').appendChild(preview);
+                        lucide.createIcons();
+                    };
+                    reader.readAsDataURL(this.files[0]);
+                }
+            });
+        }
+    });
+</script>
+<script>
+    let cropper = null;
+    let currentFile = null;
+    let currentImageSrc = null;
+
+    // Get elements
+    const photoInput = document.getElementById('photoInput');
+    const photoUrlInput = document.getElementById('photoUrlInput');
+    const cropModal = document.getElementById('cropModal');
+    const imageToCrop = document.getElementById('imageToCrop');
+    const cropBtn = document.getElementById('cropBtn');
+    const cancelCropBtn = document.getElementById('cancelCropBtn');
+    const closeCropModal = document.getElementById('closeCropModal');
+    const croppedImageInput = document.getElementById('croppedImageInput');
+
+    // Function to remove photo
+    function removePhoto() {
+        const urlInput = document.querySelector('input[name="photo_url"]');
+        const fileInput = document.querySelector('input[type="file"][name="photo"]');
+        const previewContainer = document.getElementById('previewContainer');
+
+        if (urlInput) urlInput.value = '';
+        if (fileInput) fileInput.value = '';
+        if (previewContainer) previewContainer.remove();
+        if (croppedImageInput) croppedImageInput.value = '';
+    }
+
+    // Function to open crop modal
+    function openCropModal(imageSrc) {
+        currentImageSrc = imageSrc;
+        cropModal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+
+        // Initialize cropper after modal is shown
+        setTimeout(() => {
+            initCropper(imageSrc);
+        }, 100);
+    }
+
+    // Function to close crop modal
+    function closeCropModalFn() {
+        cropModal.classList.add('hidden');
+        document.body.style.overflow = 'auto';
+        if (cropper) {
+            cropper.destroy();
+            cropper = null;
+        }
+        imageToCrop.innerHTML = '';
+        // Reset file input
+        photoInput.value = '';
+    }
+
+    // Function to initialize cropper
+    function initCropper(imageSrc) {
+        // Clear previous cropper
+        if (cropper) {
+            cropper.destroy();
+            cropper = null;
+        }
+
+        imageToCrop.innerHTML = '';
+
+        // Create image element
+        const img = document.createElement('img');
+        img.src = imageSrc;
+        img.id = 'cropperImage';
+        img.style.maxWidth = '100%';
+        img.style.maxHeight = '60vh';
+        imageToCrop.appendChild(img);
+
+        // Initialize cropper
+        cropper = new Cropper(img, {
+            aspectRatio: 1,
+            viewMode: 1,
+            autoCropArea: 1,
+            cropBoxResizable: true,
+            cropBoxMovable: true,
+            dragMode: 'move',
+            guides: true,
+            center: true,
+            highlight: true,
+            background: false,
+            responsive: true,
+        });
+    }
+
+    // Handle file input change
+    photoInput.addEventListener('change', function (e) {
+        const file = this.files[0];
+        if (!file) return;
+
+        // Check file size (5MB max)
+        if (file.size > 5 * 1024 * 1024) {
+            alert('File is too large. Maximum size is 5MB.');
+            this.value = '';
+            return;
+        }
+
+        // Check file type
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+        if (!allowedTypes.includes(file.type)) {
+            alert('Only JPEG, PNG, GIF, and WebP images are allowed.');
+            this.value = '';
+            return;
+        }
+
+        currentFile = file;
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            // Hide existing preview
+            const previewContainer = document.getElementById('previewContainer');
+            if (previewContainer) previewContainer.remove();
+            // Clear URL input
+            photoUrlInput.value = '';
+            // Open crop modal
+            openCropModal(e.target.result);
+        };
+        reader.readAsDataURL(file);
+    });
+
+    // Handle URL input (load image from URL for cropping)
+    photoUrlInput.addEventListener('change', function () {
+        const url = this.value.trim();
+        if (url) {
+            // Clear file input
+            photoInput.value = '';
+            // Remove existing preview
+            const previewContainer = document.getElementById('previewContainer');
+            if (previewContainer) previewContainer.remove();
+            // Open crop modal
+            openCropModal(url);
+        }
+    });
+
+    // Handle crop button click
+    // Update the crop button click handler
+    cropBtn.addEventListener('click', function () {
+        if (!cropper) return;
+
+        // Get cropped image as canvas
+        const canvas = cropper.getCroppedCanvas({
+            width: 300,
+            height: 300,
+            imageSmoothingEnabled: true,
+            imageSmoothingQuality: 'high',
+        });
+
+        // Convert canvas to base64
+        const croppedImageData = canvas.toDataURL('image/jpeg', 0.9);
+
+        // Store cropped image data in hidden input
+        croppedImageInput.value = croppedImageData;
+
+        // Show preview
+        const previewDiv = document.getElementById('photoPreview');
+        const existingPreview = document.getElementById('previewContainer');
+        if (existingPreview) existingPreview.remove();
+
+        const previewContainer = document.createElement('div');
+        previewContainer.id = 'previewContainer';
+        previewContainer.className = 'relative inline-block';
+        previewContainer.innerHTML = `
+        <img src="${croppedImageData}" alt="Profile photo" class="photo-preview" id="profileImage">
+        <button type="button" onclick="removePhoto()"
+            class="absolute -top-2 -right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors shadow-lg">
+            <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+    `;
+        previewDiv.appendChild(previewContainer);
+
+        // Close modal
+        closeCropModalFn();
+
+        // Reinitialize Lucide icons
+        lucide.createIcons();
+    });
+    // Handle cancel crop
+    cancelCropBtn.addEventListener('click', closeCropModalFn);
+    closeCropModal.addEventListener('click', closeCropModalFn);
+
+    // Close modal on backdrop click
+    cropModal.addEventListener('click', function (e) {
+        if (e.target === this) {
+            closeCropModalFn();
+        }
+    });
+
+    // Close modal on Escape key
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && !cropModal.classList.contains('hidden')) {
+            closeCropModalFn();
+        }
+    });
+
+    // Initialize Lucide icons
+    document.addEventListener('DOMContentLoaded', function () {
+        lucide.createIcons();
+    });
+    // Handle form submission - ensure cropped image is sent
+    document.querySelector('form').addEventListener('submit', function (e) {
+        // If there's a cropped image in the hidden input, use it
+        if (croppedImageInput && croppedImageInput.value) {
+            // The value is already in the hidden input
+            console.log('Cropped image data length:', croppedImageInput.value.length);
+        }
+    });
 </script>
 </body>
+
 </html>
