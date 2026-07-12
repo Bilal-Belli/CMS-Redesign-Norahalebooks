@@ -1,5 +1,88 @@
 <%- include('../partials/public-header', { title: book.title + ' | ' + (settings?.siteTitle || 'Nora Hale Books'), settings: settings }) %>
+<style>
+    .section-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 1.5rem;
+    }
 
+    .contact-form-section {
+        max-width: 500px;
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 1rem;
+        padding: 1.5rem;
+        text-align: center;
+    }
+
+    .contact-subtitle {
+        color: #6b7280;
+        margin-bottom: 1.5rem;
+        padding-left: 10%;
+        padding-right: 10%;
+    }
+
+    .contact-form-section form {
+        max-width: 500px;
+        margin: 0 auto;
+    }
+
+    .contact-form-section .form-group {
+        margin-bottom: 1rem;
+    }
+
+    .contact-form-section input,
+    .contact-form-section textarea {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.5rem;
+        font-size: 0.9rem;
+        transition: all 0.2s;
+        background: #f8fafc;
+    }
+
+    .contact-form-section input:focus,
+    .contact-form-section textarea:focus {
+        outline: none;
+        border-color: #059669;
+        box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
+        background: white;
+    }
+
+    .contact-form-section textarea {
+        min-height: 100px;
+        resize: vertical;
+    }
+
+    .contact-form-section .btn-send {
+        padding: 0.75rem 2.5rem;
+        background: #335F55;
+        color: white;
+        border: none;
+        border-radius: 0.5rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background 0.2s;
+        width: 100%;
+    }
+
+    .contact-form-section .btn-send:hover {
+        background: #284B43;
+    }
+
+    @media (max-width: 768px) {
+        .section-title {
+            font-size: 1.5rem;
+        }
+
+        .contact-form-section {
+            padding: 1.5rem;
+        }
+    }
+</style>
 <style>
     .book-detail {
         max-width: 3xl;
@@ -14,8 +97,8 @@
     }
 
     .book-detail .book-image {
-        width: 200px;
-        min-width: 330px;
+        width: 50%;
+        min-width: 50%;
         aspect-ratio: 3/4;
     }
 
@@ -25,21 +108,21 @@
     }
 
     .book-detail .book-title {
-        font-size: 1.75rem;
+        font-size: 1.5rem;
         font-weight: 700;
         color: #1f2937;
         margin-bottom: 0.25rem;
     }
 
     .book-detail .book-subtitle {
-        font-size: 0.875rem;
+        font-size: 1rem;
         color: #4b5563;
         font-weight: 500;
         margin-bottom: 1rem;
     }
 
     .book-detail .book-description {
-        font-size: 0.8rem;
+        font-size: 1rem;
         color: #4b5563;
         line-height: 1.9;
     }
@@ -50,15 +133,6 @@
 
     .book-detail .book-description p:last-child {
         margin-bottom: 0;
-    }
-
-    .book-detail .book-author {
-        font-size: 0.8rem;
-        font-weight: 600;
-        color: #9ca3af;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        margin-top: 1rem;
     }
 
     .book-detail .section-title {
@@ -85,7 +159,7 @@
         background: #335F55;
         color: white;
         border-radius: 0.5rem;
-        font-size: 0.875rem;
+        font-size: 1rem;
         font-weight: 500;
         transition: background 0.2s;
     }
@@ -103,21 +177,21 @@
     }
 
     .book-detail .benefit-item {
-        background: #f8fafc;
+        background: white;
         padding: 1rem;
         border-radius: 0.5rem;
         border: 1px solid #e5e7eb;
     }
 
     .book-detail .benefit-item .benefit-title {
-        font-weight: 600;
+        font-weight: 500;
         color: #1f2937;
-        font-size: 0.9rem;
-        margin-bottom: 0.25rem;
+        font-size: 1rem;
+        margin-bottom: 0.75rem;
     }
 
     .book-detail .benefit-item .benefit-desc {
-        font-size: 0.85rem;
+        font-size: 1rem;
         color: #6b7280;
         line-height: 1.6;
     }
@@ -132,7 +206,7 @@
         padding: 0.75rem 0;
         border-bottom: 1px solid #e5e7eb;
         /* Add horizontal line */
-        font-size: 0.95rem;
+        font-size: 1rem;
         color: #4b5563;
     }
 
@@ -140,7 +214,7 @@
         display: inline-flex;
         align-items: center;
         gap: 0.5rem;
-        font-size: 0.875rem;
+        font-size: 1rem;
         color: #6b7280;
         margin-bottom: 1.5rem;
         transition: color 0.2s;
@@ -150,107 +224,34 @@
         color: #1f2937;
     }
 
-    /* Newsletter Section */
-    .newsletter-section {
-        margin-top: 3rem;
-        padding-top: 2rem;
-        max-width: 600px;
-        border-top: 1px solid #e5e7eb;
-        text-align: center;
-        /* background: white; */
-        border: 1px solid #e5e7eb;
-        border-radius: 1rem;
-        padding: 2.5rem;
-        margin-top: 3rem;
-    }
-
-    .newsletter-section .newsletter-title {
-        font-size: 1.3rem;
-        font-weight: 700;
-        color: #1f2937;
-        margin-bottom: 0.5rem;
-    }
-
-    .newsletter-section .newsletter-subtitle {
-        color: #6b7280;
-        margin-bottom: 1.5rem;
-    }
-
-    .newsletter-section form {
-        max-width: 400px;
-        margin: 0 auto;
-        display: flex;
-        flex-direction: column;
-        gap: 0.75rem;
-    }
-
-    .newsletter-section input {
-        padding: 0.75rem 1rem;
-        border: 1px solid #e5e7eb;
-        border-radius: 0.5rem;
-        font-size: 0.9rem;
-        transition: all 0.2s;
-        background: #f8fafc;
-    }
-
-    .newsletter-section input:focus {
-        outline: none;
-        border-color: #059669;
-        box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
-        background: white;
-    }
-
-    .newsletter-section .btn-subscribe {
-        padding: 0.75rem 2rem;
-        background: #335F55;
-        color: white;
-        border: none;
-        border-radius: 0.5rem;
-        font-size: 0.875rem;
-        font-weight: 500;
-        cursor: pointer;
-        transition: background 0.2s;
-    }
-
-    .newsletter-section .btn-subscribe:hover {
-        background: #284B43;
-    }
-
     @media (max-width: 768px) {
         .book-detail .book-layout {
             flex-direction: column;
-            align-items: center;
+            /* align-items: center; */
             gap: 1.5rem;
         }
 
         .book-detail .book-image {
-            width: 180px;
-            min-width: 180px;
+            width: 100%;
+            min-width: 100%;
         }
 
         .book-detail .book-title {
-            font-size: 1.8rem;
-            text-align: center;
+            font-size: 1.5rem;
+            /* text-align: center; */
         }
 
+        /* 
         .book-detail .book-subtitle {
             text-align: center;
-        }
-
+        } */
+        /* 
         .book-detail .book-description {
             text-align: center;
-        }
-
-        .book-detail .book-author {
-            text-align: center;
-        }
+        } */
 
         .book-detail .buy-buttons {
             justify-content: center;
-        }
-
-        .newsletter-section {
-            padding: 1.5rem;
         }
     }
 
@@ -287,10 +288,6 @@
                 <div class="book-description">
                     <%- book.description %>
                 </div>
-
-                <!-- Author -->
-                <!-- <div class="book-author"><%= book.author %></div> -->
-
                 <!-- Buy Buttons -->
                 <% if (book.buy_buttons && book.buy_buttons.length > 0) { %>
                 <div class="buy-buttons">
@@ -332,8 +329,8 @@
 
         <!-- Medical Note -->
         <% if (book.medical_note) { %>
-        <div class="max-w-2xl mx-auto text-center">
-            <div class="mt-6 p-4 text-sm  ">
+        <div class="max-w-2xl mx-auto text-center text-gray-500">
+            <div class="mt-6 p-4">
                 <%- book.medical_note %>
             </div>
         </div>
@@ -341,18 +338,30 @@
 
         <!-- Newsletter Section -->
         <div class="flex justify-center">
-            <div class="newsletter-section">
-                <h3 class="newsletter-title">Nora's Notes on Natural Living</h3>
-                <p class="newsletter-subtitle">
-                    Thoughts about good ingredients, simple recipes, and a cleaner kind of life. Sign up for her
-                    newsletter,
-                    delivered to your inbox.
-                </p>
-                <form action="/newsletter/subscribe" method="POST">
-                    <input type="text" name="name" placeholder="Name" required>
-                    <input type="email" name="email" placeholder="Email" required>
-                    <button type="submit" class="btn-subscribe">Subscribe</button>
-                </form>
+            <div class="max-w-3xl mx-auto px-4 py-8 md:py-12 space-y-16 ">
+                <!-- Newsletter Section -->
+                <div>
+                    <h2 class="section-title text-center">Nora's Notes on Natural Living</h2>
+                    <div class="contact-subtitle text-center">
+                        Thoughts about good ingredients, simple recipes, and a cleaner kind of life. Sign up for her
+                        newsletter,
+                        delivered to your inbox.
+                    </div>
+                    <div class="contact-form-section max-w-md mx-auto text-left">
+                        <form action="/newsletter/subscribe" method="POST">
+                            <div class="form-group">
+                                <label for="name" class="block text-left">Name</label>
+                                <input type="text" name="name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="email" class="block text-left">Email</label>
+                                <input type="email" name="email" required>
+                            </div>
+                            <button type="submit" class="btn-send">Subscribe</button>
+                            <span class="text-gray-500 text-xs">We respect your privacy. Unsubscribe at any time.</span>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

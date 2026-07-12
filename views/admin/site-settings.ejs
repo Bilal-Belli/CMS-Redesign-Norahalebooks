@@ -5,7 +5,8 @@
     <div class="flex items-center justify-between mb-6 md:mb-8">
         <h1 class="text-2xl md:text-3xl font-bold text-gray-900">Site Settings</h1>
         <form action="/settings/reset" method="POST" onsubmit="return confirm('Reset all settings to defaults?');">
-            <button type="submit" class="text-sm text-red-600 hover:text-red-700 hover:bg-red-50 px-3 py-1.5 rounded-lg transition-colors">
+            <button type="submit"
+                class="text-sm text-red-600 hover:text-red-700 hover:bg-red-50 px-3 py-1.5 rounded-lg transition-colors">
                 Reset to Defaults
             </button>
         </form>
@@ -129,7 +130,7 @@
                 class="bg-[#335F55] hover:bg-[#284B43] text-white px-5 py-2.5 rounded-lg text-sm font-medium tracking-wide shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-[#335F55]/30">
                 Save Settings
             </button>
-            <a href="/settings" 
+            <a href="/settings"
                 class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-5 py-2.5 rounded-lg text-sm font-medium tracking-wide transition-colors">
                 Cancel
             </a>
@@ -173,4 +174,5 @@
     });
 </script>
 </body>
+
 </html>

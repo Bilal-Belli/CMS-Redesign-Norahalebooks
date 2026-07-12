@@ -9,46 +9,57 @@
         font-size: 14px;
         min-height: 150px;
     }
+
     .ql-editor {
         min-height: 150px;
     }
+
     .ql-editor p {
         margin-bottom: 0.75rem;
     }
+
     .ql-editor h1 {
         font-size: 2rem;
         font-weight: bold;
         margin: 0.5rem 0;
     }
+
     .ql-editor h2 {
         font-size: 1.5rem;
         font-weight: bold;
         margin: 0.5rem 0;
     }
+
     .ql-editor h3 {
         font-size: 1.25rem;
         font-weight: bold;
         margin: 0.5rem 0;
     }
-    .ql-editor ul, .ql-editor ol {
+
+    .ql-editor ul,
+    .ql-editor ol {
         padding-left: 1.5rem;
         margin: 0.5rem 0;
     }
+
     .ql-editor blockquote {
         border-left: 3px solid #e5e7eb;
         padding-left: 1rem;
         color: #6b7280;
         margin: 0.5rem 0;
     }
+
     .ql-editor a {
         color: #059669;
         text-decoration: underline;
     }
+
     .ql-editor img {
         max-width: 100%;
         margin: 0.5rem 0;
         border-radius: 0.5rem;
     }
+
     .quill-wrapper {
         background: white;
         border: 1px solid #e5e7eb;
@@ -56,10 +67,12 @@
         overflow: hidden;
         transition: all 0.2s;
     }
+
     .quill-wrapper:focus-within {
         border-color: #059669;
         box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
     }
+
     .ql-toolbar.ql-snow {
         border: none;
         border-bottom: 1px solid #e5e7eb;
@@ -67,15 +80,19 @@
         padding: 0.5rem;
         border-radius: 0.75rem 0.75rem 0 0;
     }
+
     .ql-container.ql-snow {
         border: none;
     }
+
     .ql-snow .ql-picker-label {
         color: #374151;
     }
+
     .ql-snow .ql-stroke {
         stroke: #374151;
     }
+
     .ql-snow .ql-fill {
         fill: #374151;
     }
@@ -122,7 +139,8 @@
         <!-- Message -->
         <div class="mb-6">
             <label class="block text-sm font-medium text-gray-900 mb-1">Subtitle / message</label>
-            <p class="text-xs text-gray-400 mb-2">Press Enter for new paragraphs. Bold, italic, lists, and links are supported.</p>
+            <p class="text-xs text-gray-400 mb-2">Press Enter for new paragraphs. Bold, italic, lists, and links are
+                supported.</p>
             <div class="quill-wrapper">
                 <div id="messageEditor"></div>
             </div>
@@ -132,7 +150,8 @@
         <!-- How It Works -->
         <div class="mb-6">
             <label class="block text-sm font-medium text-gray-900 mb-1">How it works (note inside form)</label>
-            <p class="text-xs text-gray-400 mb-2">Shown as a highlighted note inside the signup form card. Leave empty to hide.</p>
+            <p class="text-xs text-gray-400 mb-2">Shown as a highlighted note inside the signup form card. Leave empty
+                to hide.</p>
             <div class="quill-wrapper" style="background: #fafafa;">
                 <div id="howItWorksEditor"></div>
             </div>
@@ -158,13 +177,13 @@
     lucide.createIcons();
 
     // ============ INITIALIZE QUILL EDITORS ============
-    
+
     const toolbarOptions = [
         ['bold', 'italic', 'underline', 'strike'],
         ['blockquote', 'code-block'],
         [{ 'header': [1, 2, 3, false] }],
-        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-        [{ 'indent': '-1'}, { 'indent': '+1' }],
+        [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+        [{ 'indent': '-1' }, { 'indent': '+1' }],
         ['link', 'image'],
         ['clean']
     ];
@@ -172,9 +191,9 @@
     function initQuill(containerId, inputId, placeholder = '') {
         const container = document.getElementById(containerId);
         const input = document.getElementById(inputId);
-        
+
         if (!container) return null;
-        
+
         const quill = new Quill(container, {
             modules: {
                 toolbar: toolbarOptions
@@ -182,49 +201,49 @@
             theme: 'snow',
             placeholder: placeholder
         });
-        
+
         // Set initial content
         if (input && input.value) {
             quill.root.innerHTML = input.value;
         }
-        
+
         // Update hidden input on change
-        quill.on('text-change', function() {
+        quill.on('text-change', function () {
             if (input) {
                 input.value = quill.root.innerHTML;
             }
         });
-        
+
         return quill;
     }
 
     // Initialize all editors
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         const titleEditor = initQuill('titleEditor', 'titleInput', 'Enter page title...');
         const messageEditor = initQuill('messageEditor', 'messageInput', 'Write your message here...');
         const howItWorksEditor = initQuill('howItWorksEditor', 'howItWorksInput', 'How it works...');
-        
+
         // Re-initialize Lucide icons
         lucide.createIcons();
     });
 
     // ============ SIDEBAR FUNCTIONS ============
-    
+
     const menuToggle = document.getElementById('menu-toggle');
     const menuClose = document.getElementById('menu-close');
     const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('sidebar-overlay');
 
-    function openMenu() { 
-        sidebar.classList.remove('hidden'); 
-        sidebar.classList.add('flex'); 
-        overlay.classList.remove('hidden'); 
+    function openMenu() {
+        sidebar.classList.remove('hidden');
+        sidebar.classList.add('flex');
+        overlay.classList.remove('hidden');
     }
-    
-    function closeMenu() { 
-        sidebar.classList.add('hidden'); 
-        sidebar.classList.remove('flex'); 
-        overlay.classList.add('hidden'); 
+
+    function closeMenu() {
+        sidebar.classList.add('hidden');
+        sidebar.classList.remove('flex');
+        overlay.classList.add('hidden');
     }
 
     menuToggle?.addEventListener('click', openMenu);
@@ -233,13 +252,14 @@
 
     window.addEventListener('resize', () => {
         if (window.innerWidth >= 768) {
-            sidebar.classList.remove('hidden'); 
-            sidebar.classList.add('flex'); 
+            sidebar.classList.remove('hidden');
+            sidebar.classList.add('flex');
             overlay.classList.add('hidden');
-        } else { 
-            closeMenu(); 
+        } else {
+            closeMenu();
         }
     });
 </script>
 </body>
+
 </html>

@@ -9,18 +9,6 @@
         text-align: center;
     }
 
-    .contact-form-section .contact-title {
-        font-size: 1.75rem;
-        font-weight: 700;
-        color: #1f2937;
-        margin-bottom: 0.5rem;
-    }
-
-    .contact-subtitle {
-        color: #6b7280;
-        margin-bottom: 1.5rem;
-    }
-
     .contact-form-section form {
         max-width: 500px;
         margin: 0 auto;
@@ -71,41 +59,39 @@
         background: #284B43;
     }
 
-    .contact-form-section .contact-note {
-        margin-top: 1rem;
-        font-size: 0.8rem;
-        color: #9ca3af;
-    }
-
     @media (max-width: 768px) {
         .contact-form-section {
             padding: 1.5rem;
         }
     }
 </style>
+
 <div
-    class="w-full h-[50vh] bg-[#C3DFDB] flex items-center justify-center px-4 sm:px-12 md:px-24 lg:px-32 xl:px-64 2xl:px-64">
-    <div class="text-center">
+    class="w-full h-[50vh] bg-[#C3DFDB] flex flex-col items-center justify-center text-center px-4 sm:px-12 md:px-24 lg:px-32 xl:px-64 2xl:px-64">
+    <div class="text-xl sm:text-xl md:text-2xl lg:text-3xl">
         <%- data.title %>
+    </div>
+    <div class="text-sm sm:text-base md:text-lg mt-2 sm:mt-3 md:mt-4">
         <%- data.message %>
     </div>
-
 </div>
 
-<!-- Contact Section -->
-<div class="my-16">
-    <div class="contact-form-section max-w-md mx-auto px-4 py-4">
-        <form action="/contact/submit" method="POST">
+<div class="my-8 mx-8">
+    <div class="contact-form-section max-w-md mx-auto text-left">
+        <form action="/newsletter/subscribeBonus" method="POST">
             <div class="form-group">
-                <input type="text" name="name" placeholder="Your name" required>
+                <label for="name" class="block text-left">Name</label>
+                <input type="text" name="name" required>
             </div>
             <div class="form-group">
-                <input type="email" name="email" placeholder="Your email address" required>
+                <label for="email" class="block text-left">Email</label>
+                <input type="email" name="email" required>
             </div>
             <div class="form-group">
-                <textarea name="message" placeholder="Your message..." required></textarea>
+                <label for="message" class="block text-left">Message</label>
+                <input type="text" name="message" required>
             </div>
-            <button type="submit" class="btn-send">Send Me the Recipes</button>
+            <button type="submit" class="btn-send">Subscribe</button>
         </form>
     </div>
 </div>

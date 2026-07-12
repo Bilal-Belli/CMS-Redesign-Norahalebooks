@@ -2,7 +2,7 @@
 
 <style>
     .section-title {
-        font-size: 2rem;
+        font-size: 1.5rem;
         font-weight: 700;
         color: #1f2937;
         margin-bottom: 1.5rem;
@@ -24,14 +24,6 @@
     .book-card:hover {
         transform: translateY(-4px);
         box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
-    }
-
-    .book-card .book-image {
-        width: 20%;
-        /* max-width: 30px; */
-        /* aspect-ratio: 3/4; */
-        object-fit: cover;
-        /* background: #f8fafc; */
     }
 
     .book-card .book-content {
@@ -145,9 +137,9 @@
     }
 
     .author-section .author-content .author-text {
-        color: #4b5563;
+        color: #1a1a1b;
         line-height: 1.8;
-        font-size: 0.95rem;
+        font-size: 1rem;
     }
 
     .author-section .author-content .author-text p {
@@ -177,6 +169,8 @@
     .contact-subtitle {
         color: #6b7280;
         margin-bottom: 1.5rem;
+        padding-left: 10%;
+        padding-right: 10%;
     }
 
     .contact-form-section form {
@@ -292,10 +286,10 @@
 
     .book-row {
         display: flex;
-        gap: 2.5rem;
-        padding: 2rem 0;
+        gap: 7rem;
+        padding: 1rem 0;
         border-bottom: 1px solid #e5e7eb;
-        align-items: flex-start;
+        align-items: center;
     }
 
     .book-row:last-child {
@@ -303,10 +297,8 @@
     }
 
     .book-row .book-image {
-        width: 280px;
-        min-width: 280px;
-        aspect-ratio: 3/4;
-        background: #f8fafc;
+        width: 37%;
+        min-width: 37%;
     }
 
     .book-row .book-content {
@@ -315,11 +307,10 @@
     }
 
     .book-row .book-title {
-        font-size: 1.5rem;
+        font-size: 1.9rem;
         font-weight: 700;
         color: #1f2937;
-        margin-bottom: 0.25rem;
-        text-transform: uppercase;
+        margin-bottom: 1.25rem;
     }
 
     .book-row .book-description {
@@ -380,29 +371,37 @@
 
         .book-row {
             flex-direction: column;
-            align-items: center;
-            text-align: center;
+            /* align-items: center;
+            text-align: center; */
             gap: 1rem;
         }
 
         .book-row .book-image {
-            width: 160px;
+            width: 100%;
             min-width: unset;
         }
 
         .book-row .btn-learn {
             justify-content: center;
         }
+
+        .author-section .author-content .author-text {
+            text-align: left;
+        }
     }
 </style>
 
 <!-- Big logo section -->
-<div
+<!-- <div
     class="w-full h-screen bg-[#C3DFDB] flex items-center justify-center px-4 sm:px-12 md:px-24 lg:px-32 xl:px-64 2xl:px-64">
     <img src="/home-logo.png" alt="Image" class="w-128 h-128 object-contain" />
+</div> -->
+<div
+    class="w-full h-[50vh] md:h-dvh bg-[#C3DFDB] flex items-center justify-center px-4 sm:px-12 md:px-24 lg:px-32 xl:px-64">
+    <img src="/home-logo.png" alt="Image" class="w-128 h-128 md:w-128 md:h-128 object-contain" />
 </div>
 <div class="w-full bg-[#F1F4F4]">
-    <div class="max-w-3xl mx-auto px-4 py-8 md:py-12 space-y-16 ">
+    <div class="max-w-4xl mx-auto px-4 py-8 md:py-12 space-y-16 ">
         <!-- Featured Books Section -->
         <div class="book-row">
             <%  { %>
@@ -424,13 +423,13 @@
         <!-- Author Bio Section -->
         <% if (homepageData.author_bio?.text || aboutData.bio_text) { %>
         <div>
-            <h2 class="section-title text-center"><%= homepageData.author_bio?.heading || 'About the Author' %></h2>
-            <div class="author-section">
+            <h2 class="section-title text-center"><%= homepageData.author_bio.heading %></h2>
+            <div class="author-section ">
                 <div class="author-content">
-                    <div class="author-text">
+                    <div class="author-text ">
                         <%- homepageData.author_bio.text %>
                     </div>
-                    <div class="text-center">
+                    <div class="text-left md:text-center">
                         <a href="/about"
                             class="inline-flex items-center gap-2 text-sm font-medium text-emerald-700 hover:text-emerald-900 transition-colors">
                             Read more <i data-lucide="arrow-right" class="w-4 h-4"></i>
@@ -483,19 +482,21 @@
             <h2 class="section-title text-center"><%= homepageData.contact_section.title %></h2>
             <div class="contact-subtitle text-center">
                 <%- homepageData.contact_section.description %>
-                I personally read every message and will get back to you within 48 hours.
             </div>
 
-            <div class="contact-form-section max-w-md mx-auto">
+            <div class="contact-form-section max-w-md mx-auto text-left">
                 <form action="/contact/submit" method="POST">
                     <div class="form-group">
-                        <input type="text" name="name" placeholder="Your name" required>
+                        <label for="name" class="block text-left">Name</label>
+                        <input type="text" name="name" required>
                     </div>
                     <div class="form-group">
-                        <input type="email" name="email" placeholder="Your email address" required>
+                        <label for="email" class="block text-left">Email</label>
+                        <input type="email" name="email" required>
                     </div>
                     <div class="form-group">
-                        <textarea name="message" placeholder="Your message..." required></textarea>
+                        <label for="message" class="block text-left">Message</label>
+                        <textarea name="message" required></textarea>
                     </div>
                     <button type="submit" class="btn-send">Send message</button>
                 </form>
@@ -512,7 +513,20 @@
                 Thoughts about good ingredients, simple recipes, and a cleaner kind of life. Sign up for her newsletter,
                 delivered to your inbox.
             </div>
-            <div class="newsletter-section">
+            <div class="contact-form-section max-w-md mx-auto text-left">
+                <form action="/newsletter/subscribe" method="POST">
+                    <div class="form-group">
+                        <label for="name" class="block text-left">Name</label>
+                        <input type="text" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email" class="block text-left">Email</label>
+                        <input type="email" name="email" required>
+                    </div>
+                    <button type="submit" class="btn-send">Subscribe</button>
+                </form>
+            </div>
+            <!-- <div class="newsletter-section">
                 <form action="/newsletter/subscribe" method="POST" class="mx-auto w-full max-w-sm text-center">
                     <label for="name" class="block text-left">Name</label>
                     <input type="text" name="name" placeholder="Name" required
@@ -523,7 +537,7 @@
                     <button type="submit"
                         class="btn-subscribe w-full bg-blue-600 text-white py-2 rounded">Subscribe</button>
                 </form>
-            </div>
+            </div> -->
         </div>
     </div>
 </div>

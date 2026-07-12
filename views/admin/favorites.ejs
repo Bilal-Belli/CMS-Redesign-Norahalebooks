@@ -60,9 +60,11 @@
 
         <div class="space-y-2">
             <% categories.forEach(category => { %>
-            <div class="flex items-center justify-between bg-white border border-gray-200 rounded-lg px-4 py-2.5 shadow-sm">
+            <div
+                class="flex items-center justify-between bg-white border border-gray-200 rounded-lg px-4 py-2.5 shadow-sm">
                 <span class="text-sm text-gray-800 font-medium"><%= category %></span>
-                <form action="/favorites/category/delete/<%= category %>" method="POST" onsubmit="return confirm('Delete this category?');">
+                <form action="/favorites/category/delete/<%= category %>" method="POST"
+                    onsubmit="return confirm('Delete this category?');">
                     <button type="submit" class="text-gray-400 hover:text-red-500 transition-colors p-1">
                         <i data-lucide="trash-2" class="w-4 h-4"></i>
                     </button>
@@ -93,47 +95,54 @@
 
         <div class="space-y-3">
             <% if (products && products.length > 0) { %>
-                <% products.forEach(product => { %>
-                <div class="flex items-center justify-between bg-white border border-gray-200 rounded-xl p-3 shadow-sm hover:border-gray-300 transition-all">
-                    <div class="flex items-center gap-4">
-                        <div class="w-12 h-12 rounded-lg bg-gray-50 border border-gray-100 flex items-center justify-center overflow-hidden flex-shrink-0">
-                            <img src="<%= product.image_url %>" alt="<%= product.title %>" class="w-full h-full object-cover">
-                        </div>
-                        <div>
-                            <h4 class="text-sm font-semibold text-gray-900 leading-snug"><%= product.title %></h4>
-                            <p class="text-xs text-gray-400"><%= product.category %></p>
-                        </div>
+            <% products.forEach(product => { %>
+            <div
+                class="flex items-center justify-between bg-white border border-gray-200 rounded-xl p-3 shadow-sm hover:border-gray-300 transition-all">
+                <div class="flex items-center gap-4">
+                    <div
+                        class="w-12 h-12 rounded-lg bg-gray-50 border border-gray-100 flex items-center justify-center overflow-hidden flex-shrink-0">
+                        <img src="<%= product.image_url %>" alt="<%= product.title %>"
+                            class="w-full h-full object-cover">
                     </div>
-                    <div class="flex items-center gap-1 text-gray-400">
-                        <form action="/favorites/product/move-up/<%= product.id %>" method="POST">
-                            <button type="submit" class="p-1.5 hover:bg-gray-50 rounded-lg hover:text-gray-700 transition-colors">
-                                <i data-lucide="arrow-up" class="w-4 h-4"></i>
-                            </button>
-                        </form>
-                        <form action="/favorites/product/move-down/<%= product.id %>" method="POST">
-                            <button type="submit" class="p-1.5 hover:bg-gray-50 rounded-lg hover:text-gray-700 transition-colors">
-                                <i data-lucide="arrow-down" class="w-4 h-4"></i>
-                            </button>
-                        </form>
-                        <a href="/favorites/product/edit/<%= product.id %>"
-                            class="p-1.5 hover:bg-gray-50 rounded-lg hover:text-gray-700 transition-colors mx-1">
-                            <i data-lucide="file-text" class="w-4 h-4"></i>
-                        </a>
-                        <form action="/favorites/product/delete/<%= product.id %>" method="POST" onsubmit="return confirm('Delete this product?');">
-                            <button type="submit" class="p-1.5 hover:bg-gray-50 rounded-lg hover:text-red-500 transition-colors">
-                                <i data-lucide="trash-2" class="w-4 h-4"></i>
-                            </button>
-                        </form>
+                    <div>
+                        <h4 class="text-sm font-semibold text-gray-900 leading-snug"><%= product.title %></h4>
+                        <p class="text-xs text-gray-400"><%= product.category %></p>
                     </div>
                 </div>
-                <% }); %>
-            <% } else { %>
-                <div class="text-center py-8 bg-white border border-gray-200 rounded-xl">
-                    <p class="text-gray-500">No products added yet</p>
-                    <a href="/favorites/product/new" class="text-sm text-[#335F55] hover:underline mt-2 inline-block">
-                        Add your first product
+                <div class="flex items-center gap-1 text-gray-400">
+                    <form action="/favorites/product/move-up/<%= product.id %>" method="POST">
+                        <button type="submit"
+                            class="p-1.5 hover:bg-gray-50 rounded-lg hover:text-gray-700 transition-colors">
+                            <i data-lucide="arrow-up" class="w-4 h-4"></i>
+                        </button>
+                    </form>
+                    <form action="/favorites/product/move-down/<%= product.id %>" method="POST">
+                        <button type="submit"
+                            class="p-1.5 hover:bg-gray-50 rounded-lg hover:text-gray-700 transition-colors">
+                            <i data-lucide="arrow-down" class="w-4 h-4"></i>
+                        </button>
+                    </form>
+                    <a href="/favorites/product/edit/<%= product.id %>"
+                        class="p-1.5 hover:bg-gray-50 rounded-lg hover:text-gray-700 transition-colors mx-1">
+                        <i data-lucide="file-text" class="w-4 h-4"></i>
                     </a>
+                    <form action="/favorites/product/delete/<%= product.id %>" method="POST"
+                        onsubmit="return confirm('Delete this product?');">
+                        <button type="submit"
+                            class="p-1.5 hover:bg-gray-50 rounded-lg hover:text-red-500 transition-colors">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </form>
                 </div>
+            </div>
+            <% }); %>
+            <% } else { %>
+            <div class="text-center py-8 bg-white border border-gray-200 rounded-xl">
+                <p class="text-gray-500">No products added yet</p>
+                <a href="/favorites/product/new" class="text-sm text-[#335F55] hover:underline mt-2 inline-block">
+                    Add your first product
+                </a>
+            </div>
             <% } %>
         </div>
     </section>
@@ -149,16 +158,16 @@
     const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('sidebar-overlay');
 
-    function openMenu() { 
-        sidebar.classList.remove('hidden'); 
-        sidebar.classList.add('flex'); 
-        overlay.classList.remove('hidden'); 
+    function openMenu() {
+        sidebar.classList.remove('hidden');
+        sidebar.classList.add('flex');
+        overlay.classList.remove('hidden');
     }
-    
-    function closeMenu() { 
-        sidebar.classList.add('hidden'); 
-        sidebar.classList.remove('flex'); 
-        overlay.classList.add('hidden'); 
+
+    function closeMenu() {
+        sidebar.classList.add('hidden');
+        sidebar.classList.remove('flex');
+        overlay.classList.add('hidden');
     }
 
     menuToggle.addEventListener('click', openMenu);
@@ -167,13 +176,14 @@
 
     window.addEventListener('resize', () => {
         if (window.innerWidth >= 768) {
-            sidebar.classList.remove('hidden'); 
-            sidebar.classList.add('flex'); 
+            sidebar.classList.remove('hidden');
+            sidebar.classList.add('flex');
             overlay.classList.add('hidden');
-        } else { 
-            closeMenu(); 
+        } else {
+            closeMenu();
         }
     });
 </script>
 </body>
+
 </html>

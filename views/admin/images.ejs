@@ -60,11 +60,9 @@
                 <span class="text-xs font-mono text-gray-500 truncate" title="<%= image.originalName %>">
                     <%= image.originalName %>
                 </span>
-                <button 
-                    onclick="showDeleteModal('<%= image.id %>', '<%= image.originalName %>')"
+                <button onclick="showDeleteModal('<%= image.id %>', '<%= image.originalName %>')"
                     class="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
-                    title="Delete Image"
-                    type="button">
+                    title="Delete Image" type="button">
                     <i data-lucide="trash-2" class="w-4 h-4"></i>
                 </button>
             </div>
@@ -82,22 +80,25 @@
 
 <!-- Delete Confirmation Modal -->
 <div id="deleteModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 hidden">
-    <div class="bg-white rounded-2xl max-w-md w-full mx-4 p-6 shadow-2xl transform transition-all scale-95" id="modalContent">
+    <div class="bg-white rounded-2xl max-w-md w-full mx-4 p-6 shadow-2xl transform transition-all scale-95"
+        id="modalContent">
         <div class="text-center">
             <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-100 mb-4">
                 <i data-lucide="alert-triangle" class="h-8 w-8 text-red-600"></i>
             </div>
             <h3 class="text-xl font-bold text-gray-900 mb-2">Delete Image</h3>
             <p class="text-gray-500 mb-6">
-                Are you sure you want to delete "<span id="deleteImageName" class="font-medium text-gray-700"></span>"? 
+                Are you sure you want to delete "<span id="deleteImageName" class="font-medium text-gray-700"></span>"?
                 This action cannot be undone.
             </p>
             <div class="flex flex-col sm:flex-row gap-3 justify-center">
-                <button onclick="closeDeleteModal()" class="px-6 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-colors">
+                <button onclick="closeDeleteModal()"
+                    class="px-6 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-colors">
                     Cancel
                 </button>
                 <form id="deleteForm" method="POST">
-                    <button type="submit" class="px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors shadow-sm">
+                    <button type="submit"
+                        class="px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors shadow-sm">
                         Yes, Delete
                     </button>
                 </form>
@@ -125,11 +126,11 @@
         document.body.style.overflow = 'auto';
     }
 
-    document.getElementById('deleteModal').addEventListener('click', function(e) {
+    document.getElementById('deleteModal').addEventListener('click', function (e) {
         if (e.target === this) closeDeleteModal();
     });
 
-    document.addEventListener('keydown', function(e) {
+    document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape') closeDeleteModal();
     });
 
@@ -178,4 +179,5 @@
     });
 </script>
 </body>
+
 </html>

@@ -14,8 +14,8 @@
     }
 
     .book-row .book-image {
-        width: 280px;
-        min-width: 280px;
+        width: 50%;
+        max-width: 50%;
         aspect-ratio: 3/4;
         background: #f8fafc;
     }
@@ -30,7 +30,6 @@
         font-weight: 700;
         color: #1f2937;
         margin-bottom: 0.25rem;
-        text-transform: uppercase;
     }
 
     .book-row .book-subtitle {
@@ -54,15 +53,6 @@
         margin-bottom: 0;
     }
 
-    .book-row .book-author {
-        font-size: 0.8rem;
-        font-weight: 600;
-        color: #9ca3af;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        margin-top: 1rem;
-    }
-
     .book-row .btn-learn {
         display: inline-flex;
         align-items: center;
@@ -78,41 +68,48 @@
         color: #065f46;
     }
 
-    /* Newsletter Section */
-    .newsletter-section {
-        margin-top: 3rem;
-        padding-top: 2rem;
-        max-width: 600px;
-        border-top: 1px solid #e5e7eb;
-        text-align: center;
-        /* background: white; */
-        border: 1px solid #e5e7eb;
-        border-radius: 1rem;
-        padding: 2.5rem;
-        margin-top: 3rem;
+    .section-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 1.5rem;
     }
 
-    .newsletter-section .newsletter-title {
-        font-size: 1.3rem;
+    .contact-form-section {
+        max-width: 500px;
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 1rem;
+        padding: 1.5rem;
+        text-align: center;
+    }
+
+    .contact-form-section .contact-title {
+        font-size: 1.75rem;
         font-weight: 700;
         color: #1f2937;
         margin-bottom: 0.5rem;
     }
 
-    .newsletter-section .newsletter-subtitle {
+    .contact-subtitle {
         color: #6b7280;
         margin-bottom: 1.5rem;
+        padding-left: 10%;
+        padding-right: 10%;
     }
 
-    .newsletter-section form {
-        max-width: 400px;
+    .contact-form-section form {
+        max-width: 500px;
         margin: 0 auto;
-        display: flex;
-        flex-direction: column;
-        gap: 0.75rem;
     }
 
-    .newsletter-section input {
+    .contact-form-section .form-group {
+        margin-bottom: 1rem;
+    }
+
+    .contact-form-section input,
+    .contact-form-section textarea {
+        width: 100%;
         padding: 0.75rem 1rem;
         border: 1px solid #e5e7eb;
         border-radius: 0.5rem;
@@ -121,15 +118,21 @@
         background: #f8fafc;
     }
 
-    .newsletter-section input:focus {
+    .contact-form-section input:focus,
+    .contact-form-section textarea:focus {
         outline: none;
         border-color: #059669;
         box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
         background: white;
     }
 
-    .newsletter-section .btn-subscribe {
-        padding: 0.75rem 2rem;
+    .contact-form-section textarea {
+        min-height: 100px;
+        resize: vertical;
+    }
+
+    .contact-form-section .btn-send {
+        padding: 0.75rem 2.5rem;
         background: #335F55;
         color: white;
         border: none;
@@ -138,31 +141,45 @@
         font-weight: 500;
         cursor: pointer;
         transition: background 0.2s;
+        width: 100%;
     }
 
-    .newsletter-section .btn-subscribe:hover {
+    .contact-form-section .btn-send:hover {
         background: #284B43;
+    }
+
+    .contact-form-section .contact-note {
+        margin-top: 1rem;
+        font-size: 0.8rem;
+        color: #9ca3af;
+        letter-spacing: 0.002em;
+    }
+
+    @media (max-width: 768px) {
+        .section-title {
+            font-size: 1.5rem;
+        }
+
+        .contact-form-section {
+            padding: 1.5rem;
+        }
     }
 
     @media (max-width: 640px) {
         .book-row {
             flex-direction: column;
             align-items: center;
-            text-align: center;
+            /* text-align: center; */
             gap: 1rem;
         }
 
         .book-row .book-image {
-            width: 160px;
-            min-width: unset;
+            width: 100%;
+            max-width: 100%;
         }
 
         .book-row .btn-learn {
             justify-content: center;
-        }
-
-        .newsletter-section {
-            padding: 1.5rem;
         }
     }
 </style>
@@ -171,7 +188,7 @@
 
     <!-- Books Header -->
     <div class="mb-8 text-center">
-        <h1 class="serif-title text-4xl md:text-5xl font-bold text-gray-900 mb-3">Books</h1>
+        <h1 class="serif-title text-3xl md:text-4xl font-bold text-gray-900 mb-3">Books</h1>
         <p class="text-gray-500 text-lg">
             A growing library of practical guides for everyday wellness.
         </p>
@@ -199,8 +216,6 @@
                 <a href="/books/<%= book.slug %>" class="btn-learn">
                     Learn more <i data-lucide="arrow-right" class="w-4 h-4"></i>
                 </a>
-
-                <!-- <div class="book-author"><%= book.author || 'NORA HALE, RN' %></div> -->
             </div>
         </div>
         <% }) %>
@@ -214,18 +229,30 @@
 
     <!-- Newsletter Section -->
     <div class="flex justify-center">
-        <div class="newsletter-section">
-            <h3 class="newsletter-title">Nora's Notes on Natural Living</h3>
-            <p class="newsletter-subtitle">
-                Thoughts about good ingredients, simple recipes, and a cleaner kind of life. Sign up for her
-                newsletter,
-                delivered to your inbox.
-            </p>
-            <form action="/newsletter/subscribe" method="POST">
-                <input type="text" name="name" placeholder="Name" required>
-                <input type="email" name="email" placeholder="Email" required>
-                <button type="submit" class="btn-subscribe">Subscribe</button>
-            </form>
+        <div class="max-w-3xl mx-auto px-4 py-8 md:py-12 space-y-16 ">
+            <!-- Newsletter Section -->
+            <div>
+                <h2 class="section-title text-center">Nora's Notes on Natural Living</h2>
+                <div class="contact-subtitle text-center">
+                    Thoughts about good ingredients, simple recipes, and a cleaner kind of life. Sign up for her
+                    newsletter,
+                    delivered to your inbox.
+                </div>
+                <div class="contact-form-section max-w-md mx-auto text-left">
+                    <form action="/newsletter/subscribe" method="POST">
+                        <div class="form-group">
+                            <label for="name" class="block text-left">Name</label>
+                            <input type="text" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email" class="block text-left">Email</label>
+                            <input type="email" name="email" required>
+                        </div>
+                        <button type="submit" class="btn-send">Subscribe</button>
+                        <span class="text-gray-500 text-xs">We respect your privacy. Unsubscribe at any time.</span>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 </div>

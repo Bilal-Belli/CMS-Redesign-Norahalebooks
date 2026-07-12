@@ -104,7 +104,7 @@
 
     <!-- Posts List -->
     <div class="space-y-4">
-        <% posts.forEach(post => { %>
+        <% posts.slice().reverse().forEach(post => { %>
         <div
             class="bg-white border border-gray-200 rounded-xl p-4 flex items-center justify-between gap-4 shadow-sm hover:border-gray-300 transition-all">
             <div class="flex items-center gap-4 min-w-0 flex-1">

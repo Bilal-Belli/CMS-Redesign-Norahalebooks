@@ -5,54 +5,54 @@
     .favorites-header {
         text-align: center;
     }
-    
+
     .favorites-header h1 {
         text-align: center;
     }
-    
+
     .favorites-header p {
         text-align: center;
         margin-left: auto;
         margin-right: auto;
     }
-    
+
     .category-filters {
         display: flex;
         justify-content: center;
     }
-    
+
     /* 6 items per row on small screens */
     .products-grid {
         display: grid;
         grid-template-columns: repeat(6, 1fr);
         gap: 1rem;
     }
-    
+
     /* Responsive adjustments */
     @media (max-width: 1200px) {
         .products-grid {
             grid-template-columns: repeat(5, 1fr);
         }
     }
-    
+
     @media (max-width: 992px) {
         .products-grid {
             grid-template-columns: repeat(4, 1fr);
         }
     }
-    
+
     @media (max-width: 768px) {
         .products-grid {
             grid-template-columns: repeat(3, 1fr);
         }
     }
-    
+
     @media (max-width: 480px) {
         .products-grid {
             grid-template-columns: repeat(2, 1fr);
         }
     }
-    
+
     /* Product card - fixed height to prevent misalignment */
     .product-card {
         display: flex;
@@ -64,11 +64,11 @@
         border-radius: 0.75rem;
         transition: all 0.2s ease;
     }
-    
+
     .product-card:hover {
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     }
-    
+
     /* Fixed image container */
     .image-container {
         position: relative;
@@ -81,7 +81,7 @@
         cursor: none;
         flex-shrink: 0;
     }
-    
+
     /* Product image */
     .product-image {
         width: 100%;
@@ -89,7 +89,7 @@
         object-fit: cover;
         display: block;
     }
-    
+
     /* Magnifying glass lens */
     .magnifier-lens {
         position: absolute;
@@ -104,7 +104,7 @@
         z-index: 10;
         background-color: white;
     }
-    
+
     /* Product info - fixed height for consistency */
     .product-info {
         flex: 1;
@@ -113,7 +113,7 @@
         gap: 0.25rem;
         padding-top: 0.5rem;
     }
-    
+
     .product-title {
         font-size: 0.875rem;
         font-weight: 600;
@@ -125,7 +125,7 @@
         overflow: hidden;
         min-height: 2.4rem;
     }
-    
+
     .product-endorsement {
         font-size: 0.75rem;
         color: #047857;
@@ -136,7 +136,7 @@
         overflow: hidden;
         min-height: 2rem;
     }
-    
+
     .product-description {
         font-size: 0.75rem;
         color: #6b7280;
@@ -147,13 +147,13 @@
         overflow: hidden;
         min-height: 2.2rem;
     }
-    
+
     .product-category {
         font-size: 0.65rem;
         color: #ffffff;
         margin-top: auto;
     }
-    
+
     .buy-button {
         font-size: 0.75rem;
         font-weight: 500;
@@ -165,11 +165,11 @@
         transition: color 0.2s ease;
         text-decoration: none;
     }
-    
+
     .buy-button:hover {
         color: #065f46;
     }
-    
+
     /* Category tags */
     .category-tag {
         font-size: 0.75rem;
@@ -181,11 +181,11 @@
         cursor: pointer;
         transition: all 0.2s ease;
     }
-    
+
     .category-tag:hover {
         background: #3ead8d;
     }
-    
+
     .category-tag.active {
         background: #047857;
         color: white;
@@ -194,19 +194,19 @@
 </style>
 
 <div class="max-w-6xl mx-auto px-4 py-8 md:py-12">
-    
+
     <!-- Favorites Header - Centered -->
     <div class="favorites-header mb-10">
-        <h1 class="serif-title text-4xl md:text-5xl font-bold text-gray-900 mb-3">
+        <h1 class="serif-title text-3xl md:text-4xl font-bold text-gray-900 mb-3">
             <%= favoritesText.page_title %>
         </h1>
         <p class="text-gray-500 text-lg max-w-2xl">
             <%= favoritesText.intro_paragraph %>
         </p>
         <% if (favoritesText.affiliate_disclosure) { %>
-            <p class="text-sm text-gray-400 mt-2 italic">
-                <%= favoritesText.affiliate_disclosure %>
-            </p>
+        <p class="text-sm text-gray-400 mt-2 italic">
+            <%= favoritesText.affiliate_disclosure %>
+        </p>
         <% } %>
     </div>
 
@@ -215,7 +215,7 @@
         <div class="flex flex-wrap items-center gap-2">
             <button class="category-tag active" data-category="all">All</button>
             <% categories.forEach(cat => { %>
-                <button class="category-tag" data-category="<%= cat %>"><%= cat %></button>
+            <button class="category-tag" data-category="<%= cat %>"><%= cat %></button>
             <% }) %>
         </div>
     </div>
@@ -223,60 +223,63 @@
     <!-- Products Grid - 6 items per row -->
     <div class="products-grid">
         <% products.forEach(product => { %>
-            <% if (product.is_published) { %>
-                <div class="product-card" data-category="<%= product.category %>">
-                    
-                    <!-- Product Image with Magnifying Glass -->
-                    <div class="image-container">
-                        <img src="<%= product.image_url %>" alt="<%= product.title %>" 
-                            class="product-image" 
-                            data-zoom-image="<%= product.image_url %>">
-                        <div class="magnifier-lens"></div>
-                    </div>
+        <% if (product.is_published) { %>
+        <div class="product-card" data-category="<%= product.category %>">
 
-                    <!-- Product Info - Fixed height for consistency -->
-                    <div class="product-info">
-                        <h3 class="product-title">
-                            <%= product.title %>
-                        </h3>
-                        
-                        <% if (product.endorsement) { %>
-                            <p class="product-endorsement">
-                                "<%= product.endorsement %>"
-                            </p>
-                        <% } %>
+            <!-- Product Image with Magnifying Glass -->
+            <div class="image-container">
+                <img src="<%= product.image_url %>" alt="<%= product.title %>" class="product-image"
+                    data-zoom-image="<%= product.image_url %>">
+                <div class="magnifier-lens"></div>
+            </div>
 
-                        <% if (product.description) { %>
-                            <p class="product-description">
-                                <%= product.description.replace(/<[^>]*>/g, '').substring(0, 80) %><%= product.description.length > 80 ? '...' : '' %>
-                            </p>
-                        <% } %>
+            <!-- Product Info - Fixed height for consistency -->
+            <div class="product-info">
+                <h3 class="product-title">
+                    <%= product.title %>
+                </h3>
 
-                        <span class="product-category"><%= product.category %></span>
+                <% if (product.endorsement) { %>
+                <p class="product-endorsement">
+                    "<%= product.endorsement %>"
+                </p>
+                <% } %>
 
-                        <% if (product.buy_url) { %>
-                            <a href="<%= product.buy_url %>" target="_blank" rel="noopener noreferrer"
-                                class="buy-button">
-                                <%= product.button_label %> 
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <line x1="5" y1="12" x2="19" y2="12"></line>
-                                    <polyline points="12 5 19 12 12 19"></polyline>
-                                </svg>
-                            </a>
-                        <% } %>
-                    </div>
+                <% if (product.description) { %>
+                <p class="product-description">
+                    <%= product.description.replace(/<[^>]*>/g, '').substring(0, 80) %><%= product.description.length > 80 ? '...' : '' %>
+                </p>
+                <% } %>
 
-                </div>
-            <% } %>
+                <span class="product-category"><%= product.category %></span>
+
+                <% if (product.buy_url) { %>
+                <a href="<%= product.buy_url %>" target="_blank" rel="noopener noreferrer" class="buy-button">
+                    <%= product.button_label %>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                        <polyline points="12 5 19 12 12 19"></polyline>
+                    </svg>
+                </a>
+                <% } %>
+            </div>
+
+        </div>
+        <% } %>
         <% }) %>
 
         <% if (products.filter(p => p.is_published).length === 0) { %>
-            <div class="col-span-full text-center py-16 bg-white border border-gray-100 rounded-xl text-gray-400">
-                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-12 h-12 mx-auto mb-3 text-gray-300">
-                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                </svg>
-                <p class="text-sm">No favorite products added yet. Check back soon!</p>
-            </div>
+        <div class="col-span-full text-center py-16 bg-white border border-gray-100 rounded-xl text-gray-400">
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                class="w-12 h-12 mx-auto mb-3 text-gray-300">
+                <path
+                    d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z">
+                </path>
+            </svg>
+            <p class="text-sm">No favorite products added yet. Check back soon!</p>
+        </div>
         <% } %>
     </div>
 
@@ -284,17 +287,17 @@
 
 <script>
     // Category filter functionality
-    document.querySelectorAll('.category-tag').forEach(function(tag) {
-        tag.addEventListener('click', function() {
-            document.querySelectorAll('.category-tag').forEach(function(t) {
+    document.querySelectorAll('.category-tag').forEach(function (tag) {
+        tag.addEventListener('click', function () {
+            document.querySelectorAll('.category-tag').forEach(function (t) {
                 t.classList.remove('active');
             });
             this.classList.add('active');
-            
+
             var category = this.dataset.category;
             var products = document.querySelectorAll('.product-card');
-            
-            products.forEach(function(product) {
+
+            products.forEach(function (product) {
                 if (category === 'all' || product.dataset.category === category) {
                     product.style.display = 'flex';
                 } else {
@@ -305,7 +308,7 @@
     });
 
     // Magnifying Glass Effect (like Amazon/eBay)
-    document.querySelectorAll('.image-container').forEach(function(container) {
+    document.querySelectorAll('.image-container').forEach(function (container) {
         var lens = container.querySelector('.magnifier-lens');
         var image = container.querySelector('.product-image');
         var isHovering = false;
@@ -314,36 +317,36 @@
         function setZoomBackground(x, y) {
             var rect = container.getBoundingClientRect();
             var imageRect = image.getBoundingClientRect();
-            
+
             // Calculate position relative to the image
             var xPos = ((x - imageRect.left) / imageRect.width) * 100;
             var yPos = ((y - imageRect.top) / imageRect.height) * 100;
-            
+
             // Calculate zoomed background position
             var lensSize = lens.offsetWidth;
             var zoomFactor = 2.5;
-            
+
             var bgX = ((x - imageRect.left) / imageRect.width) * 100;
             var bgY = ((y - imageRect.top) / imageRect.height) * 100;
-            
+
             lens.style.backgroundImage = 'url(' + image.src + ')';
             lens.style.backgroundSize = (imageRect.width * zoomFactor) + 'px ' + (imageRect.height * zoomFactor) + 'px';
             lens.style.backgroundPosition = bgX + '% ' + bgY + '%';
-            
+
             // Position the lens
             var lensX = x - imageRect.left - lensSize / 2;
             var lensY = y - imageRect.top - lensSize / 2;
-            
+
             // Keep lens within container bounds
             var maxX = imageRect.width - lensSize;
             var maxY = imageRect.height - lensSize;
-            
+
             lens.style.left = Math.max(0, Math.min(lensX, maxX)) + 'px';
             lens.style.top = Math.max(0, Math.min(lensY, maxY)) + 'px';
         }
 
         // Mouse events for magnifying glass
-        container.addEventListener('mouseenter', function(e) {
+        container.addEventListener('mouseenter', function (e) {
             isHovering = true;
             lens.style.display = 'block';
             // Set initial position
@@ -353,26 +356,26 @@
             setZoomBackground(x, y);
         });
 
-        container.addEventListener('mousemove', function(e) {
+        container.addEventListener('mousemove', function (e) {
             if (!isHovering) return;
             var x = e.clientX;
             var y = e.clientY;
             setZoomBackground(x, y);
         });
 
-        container.addEventListener('mouseleave', function() {
+        container.addEventListener('mouseleave', function () {
             isHovering = false;
             lens.style.display = 'none';
         });
 
         // Touch events for mobile
-        container.addEventListener('touchstart', function(e) {
+        container.addEventListener('touchstart', function (e) {
             e.preventDefault();
             var touch = e.touches[0];
             var rect = container.getBoundingClientRect();
             var x = touch.clientX;
             var y = touch.clientY;
-            
+
             if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) {
                 isHovering = true;
                 lens.style.display = 'block';
@@ -380,14 +383,14 @@
             }
         });
 
-        container.addEventListener('touchmove', function(e) {
+        container.addEventListener('touchmove', function (e) {
             e.preventDefault();
             if (!isHovering) return;
             var touch = e.touches[0];
             setZoomBackground(touch.clientX, touch.clientY);
         });
 
-        container.addEventListener('touchend', function() {
+        container.addEventListener('touchend', function () {
             isHovering = false;
             lens.style.display = 'none';
         });

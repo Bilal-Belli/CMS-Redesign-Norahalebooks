@@ -6,12 +6,18 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title><%= title || settings?.siteTitle || 'Nora Hale Books' %></title>
         <link rel="icon" type="image/png" href="/favicon.png">
-        <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:ital,wght@0,400..900;1,400..900&display=swap"
+            rel="stylesheet">
         <script src="https://cdn.tailwindcss.com"></script>
         <script src="https://unpkg.com/lucide@latest"></script>
         <style>
             body {
+                font-family: "Schibsted Grotesk", sans-serif;
                 background: #F6F9F8;
+                letter-spacing: -0.01em;
             }
 
             .blog-content h2 {
@@ -100,73 +106,73 @@
 
     <body>
         <!-- Header -->
-<header class="sticky top-0 z-50 bg-[#F6F9F8]/75 backdrop-blur border-b border-gray-200">
+        <header class="sticky top-0 z-50 bg-[#F6F9F8]/75 backdrop-blur border-b border-gray-200">
 
-    <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between ">
+            <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between ">
 
-        <a href="/" class=" text-2xl font-bold text-gray-900">
-            <img src="/home-logo.png" alt="Nora Hale Books Logo" class="h-14 w-auto">
-        </a>
+                <a href="/" class=" text-2xl font-bold text-gray-900">
+                    <img src="/home-logo.png" alt="Nora Hale Books Logo" class="h-14 w-auto">
+                </a>
 
-        <!-- Desktop -->
-        <nav class="hidden md:flex items-center gap-7 text-sm font-medium text-gray-600 ">
-            <a href="/" class="hover:text-emerald-700 transition">Home</a>
-            <a href="/about" class="hover:text-emerald-700 transition">About Nora</a>
-            <a href="/books" class="hover:text-emerald-700 transition">Books</a>
-            <a href="/benefits" class="hover:text-emerald-700 transition">Recipes</a>
-            <a href="/favorites" class="hover:text-emerald-700 transition">Favorites</a>
-            <a href="/blog" class="hover:text-emerald-700 transition">Blogs</a>
-            <a href="/contact" class="hover:text-emerald-700 transition">Connect</a>
-        </nav>
+                <!-- Desktop -->
+                <nav class="hidden md:flex items-center gap-7 text-sm font-medium text-gray-600 ">
+                    <a href="/" class="hover:text-emerald-700 transition">Home</a>
+                    <a href="/about" class="hover:text-emerald-700 transition">About Nora</a>
+                    <a href="/books" class="hover:text-emerald-700 transition">Books</a>
+                    <a href="/benefits" class="hover:text-emerald-700 transition">Recipes</a>
+                    <a href="/favorites" class="hover:text-emerald-700 transition">Favorites</a>
+                    <a href="/blog" class="hover:text-emerald-700 transition">Blogs</a>
+                    <a href="/contact" class="hover:text-emerald-700 transition">Connect</a>
+                </nav>
 
-        <!-- Mobile button -->
-        <button id="menu-btn"
-    class="md:hidden w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-100">
+                <!-- Mobile button -->
+                <button id="menu-btn"
+                    class="md:hidden w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-100">
 
-    <i id="menu-open" data-lucide="menu" class="w-6 h-6"></i>
-    <i id="menu-close" data-lucide="x" class="w-6 h-6 hidden"></i>
+                    <i id="menu-open" data-lucide="menu" class="w-6 h-6"></i>
+                    <i id="menu-close" data-lucide="x" class="w-6 h-6 hidden"></i>
 
-</button>
+                </button>
 
-    </div>
+            </div>
 
-    <!-- Mobile Menu -->
-    <div id="mobile-menu"
-        class="hidden md:hidden absolute top-full left-0 w-full bg-white border-b border-gray-200 shadow-lg">
+            <!-- Mobile Menu -->
+            <div id="mobile-menu"
+                class="hidden md:hidden absolute top-full left-0 w-full bg-white border-b border-gray-200 shadow-lg">
 
-        <nav class="flex flex-col py-3">
+                <nav class="flex flex-col py-3">
 
-            <a href="/" class="px-6 py-3 hover:bg-gray-50 transition">
-                Home
-            </a>
+                    <a href="/" class="px-6 py-3 hover:bg-gray-50 transition">
+                        Home
+                    </a>
 
-            <a href="/about" class="px-6 py-3 hover:bg-gray-50 transition">
-                About Nora
-            </a>
+                    <a href="/about" class="px-6 py-3 hover:bg-gray-50 transition">
+                        About Nora
+                    </a>
 
-            <a href="/books" class="px-6 py-3 hover:bg-gray-50 transition">
-                Books
-            </a>
+                    <a href="/books" class="px-6 py-3 hover:bg-gray-50 transition">
+                        Books
+                    </a>
 
-            <a href="/benefits" class="px-6 py-3 hover:bg-gray-50 transition">
-                Recipes
-            </a>
+                    <a href="/benefits" class="px-6 py-3 hover:bg-gray-50 transition">
+                        Recipes
+                    </a>
 
-            <a href="/favorites" class="px-6 py-3 hover:bg-gray-50 transition">
-                Favorites
-            </a>
+                    <a href="/favorites" class="px-6 py-3 hover:bg-gray-50 transition">
+                        Favorites
+                    </a>
 
-            <a href="/blog"
-                class="px-6 py-3 bg-emerald-50 text-emerald-700 font-semibold border-l-4 border-emerald-600">
-                Blog
-            </a>
+                    <a href="/blog"
+                        class="px-6 py-3 bg-emerald-50 text-emerald-700 font-semibold border-l-4 border-emerald-600">
+                        Blog
+                    </a>
 
-            <a href="/contact" class="px-6 py-3 hover:bg-gray-50 transition">
-                Connect
-            </a>
+                    <a href="/contact" class="px-6 py-3 hover:bg-gray-50 transition">
+                        Connect
+                    </a>
 
-        </nav>
+                </nav>
 
-    </div>
+            </div>
 
-</header>
+        </header>

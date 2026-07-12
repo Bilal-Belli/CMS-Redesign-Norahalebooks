@@ -1,13 +1,25 @@
 <%- include('../partials/public-header', { title: settings?.siteTitle || 'Nora Hale Books', settings: settings }) %>
+
 <style>
     .contact-form-section {
-        max-width: 720px;
+        width: 70%;
+        max-width: 70%;
         margin: 0 auto;
         background: #fff;
         border: 1px solid #e5e7eb;
         border-radius: 18px;
         padding: 3rem;
         box-shadow: 0 12px 40px rgba(15, 23, 42, .06);
+    }
+
+    .notice-section {
+        width: 70%;
+        max-width: 70%;
+        border: 1px solid #e5e7eb;
+        border-radius: 18px;
+        padding: 1rem;
+        margin: 0 auto;
+        background: #ddf9f5;
     }
 
     .contact-form-section form {
@@ -56,44 +68,6 @@
         min-height: 140px;
     }
 
-    .checkbox-group {
-        margin: 2rem 0;
-    }
-
-    .checkbox-group>label {
-        margin-bottom: 1rem;
-    }
-
-    .checkbox-item {
-        display: flex;
-        align-items: flex-start;
-        gap: .75rem;
-        margin-bottom: .9rem;
-    }
-
-    .checkbox-item input[type="checkbox"] {
-        width: 18px;
-        height: 18px;
-        margin-top: 2px;
-        accent-color: #335F55;
-        flex-shrink: 0;
-    }
-
-    .checkbox-item label {
-        margin: 0;
-        font-weight: 400;
-        line-height: 1.5;
-        color: #374151;
-        cursor: pointer;
-    }
-
-    .form-note {
-        font-size: .85rem;
-        color: #6b7280;
-        margin: -.5rem 0 2rem;
-        line-height: 1.5;
-    }
-
     .btn-send {
         display: inline-flex;
         justify-content: center;
@@ -119,9 +93,16 @@
     }
 
     @media (max-width:768px) {
+        .notice-section {
+            width: 95%;
+            max-width: 95%;
+        }
+
         .contact-form-section {
-            padding: 2rem 1.5rem;
-            border-radius: 14px;
+            width: 95%;
+            max-width: 95%;
+            /* padding: 2rem 1.5rem; */
+            /* border-radius: 14px; */
         }
 
         .btn-send {
@@ -130,69 +111,78 @@
     }
 </style>
 
+<!-- Header Section -->
 <div
-    class="w-full h-[50vh] bg-[#C3DFDB] flex items-center justify-center px-4 sm:px-12 md:px-24 lg:px-32 xl:px-64 2xl:px-64">
-    <div class="text-center">
+    class="w-full h-[50vh] bg-[#C3DFDB] flex flex-col items-center justify-center text-center px-4 sm:px-12 md:px-24 lg:px-32 xl:px-64 2xl:px-64">
+    <div class="text-xl sm:text-xl md:text-2xl lg:text-3xl">
         <%- data.title %>
+    </div>
+    <div class="text-sm sm:text-base md:text-lg mt-2 sm:mt-3 md:mt-4">
         <%- data.message %>
     </div>
 </div>
 
-<!-- Contact Section -->
-<div class="my-16">
-    <div class="contact-form-section max-w-md mx-auto px-4 py-4">
+<!-- Form Section -->
+<div class="my-4">
+    <div class="notice-section max-w-md mx-auto my-2 bg-[#C3DFDB]">
         <div class="text-sm my-4">
             <%- data.howItWorks %>
         </div>
-        <div class="text-sm my-4"></div>
+    </div>
 
-        <form action="/contact/submit" method="POST">
-            <div class="form-group">
-                <label>Name</label>
-                <input type="text" name="name" required>
-            </div>
-            <div class="form-group">
-                <label>Email</label>
-                <input type="email" name="email" required>
-            </div>
-            <div class="form-group checkbox-group">
-                <label>Where do you post reviews?</label>
-                <div class="checkbox-item">
-                    <input type="checkbox" name="platforms" value="Amazon" id="amazon">
-                    <label for="amazon">Amazon</label>
+    <div class="my-4 flex justify-center items-center min-h-[200px]">
+        <div class="contact-form-section max-w-md mx-auto text-left">
+            <form action="/newsletter/subscribeARC" method="POST">
+                <!-- Name -->
+                <div class="form-group">
+                    <label for="name" class="block text-left">Name</label>
+                    <input type="text" name="name" required>
                 </div>
-                <div class="checkbox-item">
-                    <input type="checkbox" name="platforms" value="Goodreads" id="goodreads">
-                    <label for="goodreads">Goodreads</label>
+
+                <!-- Email -->
+                <div class="form-group">
+                    <label for="email" class="block text-left">Email</label>
+                    <input type="email" name="email" required>
                 </div>
-                <div class="checkbox-item">
-                    <input type="checkbox" name="platforms" value="Booktok/Tiktok" id="booktok">
-                    <label for="booktok">Booktok/Tiktok</label>
+
+                <!-- Genre Custom Field -->
+                <div class="form-group">
+                    <label for="genre" class="block text-left">What type of books or genre do you typically
+                        read?</label>
+                    <input type="text" name="genre">
                 </div>
-                <div class="checkbox-item">
-                    <input type="checkbox" name="platforms" value="Bookstagram" id="bookstagram">
-                    <label for="bookstagram">Bookstagram</label>
+
+                <!-- Review Platforms Tags (Multiple choices allowed) -->
+                <div class="form-group">
+                    <label class="block text-left">Where do you post reviews?</label>
+                    <div>
+                        <label><input type="checkbox" name="review_platforms" value="20016160"> Amazon</label>
+                    </div>
+                    <div>
+                        <label><input type="checkbox" name="review_platforms" value="20016163"> Goodreads</label>
+                    </div>
+                    <div>
+                        <label><input type="checkbox" name="review_platforms" value="20016165"> Booktok/Tiktok</label>
+                    </div>
+                    <div>
+                        <label><input type="checkbox" name="review_platforms" value="20016177"> Bookstagram</label>
+                    </div>
+                    <div>
+                        <label><input type="checkbox" name="review_platforms" value="20016198"> I'm new to
+                            reviewing</label>
+                    </div>
                 </div>
-                <div class="checkbox-item">
-                    <input type="checkbox" name="platforms" value="I'm new to reviewing" id="new-reviewer">
-                    <label for="new-reviewer">I'm new to reviewing</label>
+
+                <!-- Agreement Tag (Required Checkbox) -->
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="agreement" value="20016695" required>
+                        I understand I'm agreeing to post an honest review within 4 weeks of receiving my copy
+                    </label>
                 </div>
-            </div>
-            <div class="form-group">
-                <label>What type of books or genres do you typically read?</label>
-                <textarea name="message" placeholder="Fantasy, romance, mystery, historical fiction..."
-                    required></textarea>
-            </div>
-            <div class="form-group checkbox-item">
-                <input type="checkbox" name="agree" value="agree" id="agree" required>
-                <label for="agree">I understand I'm agreeing to post an honest review within 4 weeks of receiving my
-                    copy*</label>
-            </div>
-            <p class="form-note">
-                We respect your privacy. Unsubscribe at any time.
-            </p>
-            <button type="submit" class="btn-send">Send My Application</button>
-        </form>
+                <button type="submit" class="btn-send">Subscribe</button>
+            </form>
+        </div>
     </div>
 </div>
 
