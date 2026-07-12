@@ -1013,26 +1013,111 @@ app.post('/images/delete/:id', isAuthenticated, (req, res) => {
     }
 });
 
-app.post('/newsletter/subscribe', (req, res) => {
+app.post('/newsletter/subscribe', async (req, res) => {
     try {
         const { name, email } = req.body;
 
-        // Here you would integrate with your email marketing service (Kit, Mailchimp, etc.)
-        // For now, we'll just log it
+        const response = await fetch(`https://api.kit.com/v3/forms/${process.env.KIT_FORM_ID_1}/subscribe`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+                // Removed Bearer Authorization header
+            },
+            body: JSON.stringify({
+                api_key: process.env.KIT_API_KEY, // Added API key to the body
+                email: email,
+                first_name: name
+            })
+        });
 
-        // You would typically send this to your email service provider's API
-        // Example with Kit (formerly ConvertKit):
-        // const response = await fetch('https://api.kit.com/v3/forms/YOUR_FORM_ID/subscribe', {
-        //     method: 'POST',
-        //     headers: {
-        //         'Content-Type': 'application/json',
-        //         'Authorization': 'Bearer YOUR_API_KEY'
-        //     },
-        //     body: JSON.stringify({
-        //         email: email,
-        //         first_name: name
-        //     })
-        // });
+        if (!response.ok) {
+            // Read detailed response error message from Kit if it fails
+            const errorText = await response.text();
+            throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
+        }
+
+        res.redirect('/books?success=Thank you for subscribing!');
+    } catch (error) {
+        console.error('Newsletter subscription error:', error);
+        res.redirect('/books?error=Failed to subscribe. Please try again.');
+    }
+});
+
+app.post('/newsletter/subscribeARC', async (req, res) => {
+    try {
+        const { name, email, genre, review_platforms, agreement } = req.body;
+
+        const tags = [];
+        if (review_platforms) {
+            if (Array.isArray(review_platforms)) {
+                tags.push(...review_platforms);
+            } else {
+                tags.push(review_platforms);
+            }
+        }
+        if (agreement) {
+            tags.push(agreement);
+        }
+
+        // 1. Target the V3 forms subscribe endpoint
+        const response = await fetch(`https://api.kit.com/v3/forms/${process.env.KIT_FORM_ID_2}/subscribe`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+                // Removed the 'Authorization': 'Bearer ...' header entirely
+            },
+            body: JSON.stringify({
+                api_key: process.env.KIT_API_KEY, // 2. Pass your API Key directly inside the body
+                email: email,
+                first_name: name,
+                fields: {
+                    genre_you_typically_read: genre || ""
+                },
+                tags: tags
+            })
+        });
+
+        if (!response.ok) {
+            // Log the error body from Kit if it fails to see the exact message
+            const errorText = await response.text();
+            throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
+        }
+
+        res.redirect('/books?success=Thank you for subscribing!');
+    } catch (error) {
+        console.error('Newsletter subscription error:', error);
+        res.redirect('/books?error=Failed to subscribe. Please try again.');
+    }
+});
+
+app.post('/newsletter/subscribeBonus', async (req, res) => {
+    try {
+        const { name, email, message } = req.body;
+
+        console.log("Checking API Token:", process.env.KIT_API_KEY ? "Token exists" : "Token is UNDEFINED");
+
+        const response = await fetch(`https://api.kit.com/v3/forms/${process.env.KIT_FORM_ID_3}/subscribe`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+                // Removed Bearer Authorization header
+            },
+            body: JSON.stringify({
+                api_key: process.env.KIT_API_KEY, // Added API key to the body
+                email: email,
+                first_name: name,
+                // Note: Kit's default subscription schema doesn't have a top-level "message" field.
+                // If "message" is a custom field in Kit, it should technically live inside fields: { message }
+                // Leaving it here or nested depending on your Kit field configurations.
+                message: message
+            })
+        });
+
+        if (!response.ok) {
+            // Read detailed response error message from Kit if it fails
+            const errorText = await response.text();
+            throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
+        }
 
         res.redirect('/books?success=Thank you for subscribing!');
     } catch (error) {
